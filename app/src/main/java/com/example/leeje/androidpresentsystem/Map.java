@@ -68,16 +68,6 @@ public class Map extends NMapFragment implements NMapView.OnMapStateChangeListen
             nMapView.setBuiltInZoomControls(true,null);
             mapController.setMapCenter(new NGeoPoint(126.978371,37.5666091),11);
 
-// set POI data
-            NMapPOIdata poiData = new NMapPOIdata(2,null);
-            poiData.beginPOIdata(2);
-            poiData.addPOIitem(127.0630205, 37.5091300, "Pizza 777-111", 0, 0);
-            poiData.addPOIitem(127.061, 37.51, "Pizza 123-456", 0, 0);
-            poiData.endPOIdata();
-
-// create POI data overlay
-          //  NMapPOIdataOverlay poiDataOverlay = mOverlayManager.createPOIdataOverlay(poiData, null);
-            //poiDataOverlay.showAllPOIdata(0);
         }
     }
 
