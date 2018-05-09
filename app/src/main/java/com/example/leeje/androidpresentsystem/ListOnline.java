@@ -19,7 +19,7 @@ import com.google.firebase.database.DatabaseReference;
 public class ListOnline extends AppCompatActivity {
 
     Button detail;
-    
+    Button show;
 
     //firebase
     DatabaseReference onlineRef,currentUserRef, counterRef;
