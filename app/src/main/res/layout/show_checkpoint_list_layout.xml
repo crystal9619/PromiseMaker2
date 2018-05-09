@@ -20,22 +20,25 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ImageView
-            android:id="@+id/imageView"
+        <fragment
+            android:id="@+id/fragment"
+            android:name="com.example.leeje.androidpresentsystem.Map"
             android:layout_width="match_parent"
-            android:layout_height="375dp"
-            app:srcCompat="@drawable/ic_launcher_background" />
+            android:layout_height="0dp"
+            android:layout_weight="5"/>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2"
             android:orientation="horizontal">
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:layout_weight="1">
 
                 <ImageView
                     android:id="@+id/imageView2"
@@ -54,10 +57,10 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="8"
                 android:text="주소"
                 android:textAlignment="center"
-                android:textSize="24sp" />
+                android:textSize="24sp"
+                android:layout_weight="10"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -65,9 +68,25 @@
                 android:text="시간"
                 android:textAlignment="center"
                 android:textSize="24sp"
-                />
+                android:layout_weight="2"/>
+
 
         </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <Button
+                android:id="@+id/button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentEnd="true"
+                android:text="확인" />
+
+        </RelativeLayout>
 
     </LinearLayout>
 
