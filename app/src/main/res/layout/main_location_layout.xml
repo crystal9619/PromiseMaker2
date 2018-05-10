@@ -20,16 +20,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ImageView
-            android:id="@+id/imageView"
+        <com.nhn.android.maps.NMapView
+            android:id="@+id/map_view"
             android:layout_width="match_parent"
-            android:layout_height="375dp"
-            app:srcCompat="@drawable/ic_launcher_background" />
+            android:layout_height="0dp"
+            android:layout_weight="8"></com.nhn.android.maps.NMapView>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
+            android:layout_height="0dp"
+            android:orientation="horizontal"
+            android:layout_weight="2">
 
             <LinearLayout
                 android:layout_width="wrap_content"

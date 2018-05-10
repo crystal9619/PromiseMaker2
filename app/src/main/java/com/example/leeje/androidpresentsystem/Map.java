@@ -27,7 +27,7 @@ import com.nhn.android.mapviewer.overlay.NMapResourceProvider;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class Map extends NMapFragment implements NMapView.OnMapStateChangeListener{
+public class Map extends NMapFragment implements NMapView.OnMapStateChangeListener,NMapPOIdataOverlay.OnStateChangeListener{
 
     private static final String NAVER_CLIENT_ID="BLqBZK9lmPHKaFgf2WYv";
     public Map() {
@@ -92,4 +92,13 @@ public class Map extends NMapFragment implements NMapView.OnMapStateChangeListen
     }
 
 
+    @Override
+    public void onFocusChanged(NMapPOIdataOverlay nMapPOIdataOverlay, NMapPOIitem nMapPOIitem) {
+
+    }
+
+    @Override
+    public void onCalloutClick(NMapPOIdataOverlay nMapPOIdataOverlay, NMapPOIitem nMapPOIitem) {
+
+    }
 }
