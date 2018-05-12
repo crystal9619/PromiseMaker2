@@ -20,11 +20,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <com.nhn.android.maps.NMapView
-            android:id="@+id/map_view"
+
+        <fragment
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="8"></com.nhn.android.maps.NMapView>
+            android:layout_weight="8"
+            tools:context="com.example.leeje.androidpresentsystem.MapsActivity" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -52,9 +55,12 @@
 
             </LinearLayout>
 
+
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:id="@+id/adr"
                 android:layout_weight="8"
                 android:text="주소"
                 android:textAlignment="center"

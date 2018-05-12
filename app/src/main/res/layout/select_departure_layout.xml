@@ -13,14 +13,16 @@
         tools:ignore="MissingConstraints">
 
         <fragment
-            android:id="@+id/fragment"
-            android:name="com.example.leeje.androidpresentsystem.Map"
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="5"/>
+            android:layout_weight="5"
+            tools:context="com.example.leeje.androidpresentsystem.MakeDetail" />
 
 
         <TextView
+            android:id="@+id/departure"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:text="출발지"
