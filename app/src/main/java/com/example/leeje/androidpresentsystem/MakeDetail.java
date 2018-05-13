@@ -33,7 +33,6 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -73,6 +72,8 @@ public class MakeDetail extends AppCompatActivity
     boolean mMoveMapByAPI = true;
     LatLng currentPosition;
 
+    LatLng departure;
+
     LocationRequest locationRequest = new LocationRequest()
             .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
             .setInterval(UPDATE_INTERVAL_MS)
@@ -91,6 +92,8 @@ public class MakeDetail extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(),makeDetail2.class);
+                intent.putExtra("lat",departure.latitude);
+                intent.putExtra("lon",departure.longitude);
                 startActivity(intent);
                 finish();
             }
@@ -612,8 +615,9 @@ public class MakeDetail extends AppCompatActivity
 
     @Override
     public void onMapLongClick(LatLng latLng) {
-        mGoogleMap.addMarker(new MarkerOptions().position(latLng).title("출발지"));
+        mGoogleMap.addMarker(new MarkerOptions().position(latLng).title("출발지").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
         dep.setText(getCurrentAddress(latLng));
+        departure=latLng;
 
     }
 
