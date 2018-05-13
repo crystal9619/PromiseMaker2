@@ -3,13 +3,17 @@ package com.example.leeje.androidpresentsystem;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.AsyncTask;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Layout;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,6 +27,11 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -41,33 +50,62 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 
 import javax.net.ssl.HttpsURLConnection;
 
 import static java.lang.Thread.State.TERMINATED;
 
-public class makeDetail2 extends AppCompatActivity implements OnMapReadyCallback{
+public class makeDetail2 extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener{
+
+    private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+    private DatabaseReference databaseReference = firebaseDatabase.getReference();
+
 
     private GoogleMap mGoogleMap = null;
-    String b="냐";
-    TextView adr;
+
+    private LinearLayout layout1;
+    private LinearLayout layout2;
+    TextView adr1;
+    TextView adr2;
     Double lat;
     Double lon;
     Button pre;
     Button next;
-    Double endlat;
-    Double endlon;
+    Double endlat=37.450890;
+    Double endlon=126.656827;
+    Double ck1lat;
+    Double ck1lon;
+    Double ck2lat;
+    Double ck2lon;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.select_checkpoint_layout);
-        adr=(TextView) findViewById(R.id.adr);
+        adr1=(TextView) findViewById(R.id.adr1);
+        adr2=(TextView) findViewById(R.id.adr2);
+        layout1=(LinearLayout) findViewById(R.id.layout1);
+        layout2=(LinearLayout) findViewById(R.id.layout2);
 
         Intent intent =getIntent();
-        lat= intent.getDoubleExtra("lat",0);
-        lon = intent.getDoubleExtra("lon",0);
+    //    lat= intent.getDoubleExtra("lat",0);
+      //  lon = intent.getDoubleExtra("lon",0);
 
+        databaseReference.child("start").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                /*
+                DataSnapshot ss= dataSnapshot.getChildren();
+                ss.child("")
+                */
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -80,6 +118,10 @@ public class makeDetail2 extends AppCompatActivity implements OnMapReadyCallback
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(),showCheckpoint.class);
+                intent.putExtra("ck1lat",ck1lat);
+                intent.putExtra("ck1lon",ck1lon);
+                intent.putExtra("ck2lat",ck2lat);
+                intent.putExtra("ck2lon",ck2lon);
                 startActivity(intent);
                 finish();
             }
@@ -101,9 +143,9 @@ public class makeDetail2 extends AppCompatActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mGoogleMap = googleMap;
-
+        mGoogleMap.setOnMapLongClickListener(this);
         DownloadTask downloadTask = new DownloadTask();
-        String url = "https://maps.googleapis.com/maps/api/directions/json?origin="+Double.toString(lat)+","+Double.toString(lon)+"&destination=37.4475541,126.6531090&mode=transit&key=AIzaSyDdDWNDyd7YM9RRTdCa10ha3PhIOPScqQA";
+        String url = "https://maps.googleapis.com/maps/api/directions/json?origin="+Double.toString(lat)+","+Double.toString(lon)+"&destination="+Double.toString(endlat)+","+Double.toString(endlon)+"&mode=transit&key=AIzaSyDdDWNDyd7YM9RRTdCa10ha3PhIOPScqQA";
        Log.d("??",url);
         String result="";
        String route="";
@@ -150,36 +192,16 @@ public class makeDetail2 extends AppCompatActivity implements OnMapReadyCallback
         mGoogleMap.animateCamera(zoom);
 
         //마커 표시하기
-        MarkerOptions marker = new MarkerOptions();
-        marker.position(new LatLng(lat, lon))
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_map_start));//부제
-        mGoogleMap.addMarker(marker).showInfoWindow();
+        MarkerOptions start = new MarkerOptions();
+        start.position(new LatLng(lat, lon))
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_map_start));
+        mGoogleMap.addMarker(start).showInfoWindow();
 
-        //자신의 위치
-        /*
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }*/
-    //    mGoogleMap.setMyLocationEnabled(true);
+        MarkerOptions end = new MarkerOptions();
+        end.position(new LatLng(endlat,endlon)).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_map_arrive));
+        mGoogleMap.addMarker(end).showInfoWindow();
 
-        //이벤트 처리하기
-        /*
-        mGoogleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker) {
-                Toast.makeText(getApplicationContext(), marker.getTitle() + "를 클릭했습니다.", Toast.LENGTH_SHORT).show();
-                return false;
-            }
 
-        });
-*/
     }
 
     public static List<LatLng> decode(final String encodedPath) {
@@ -218,6 +240,63 @@ public class makeDetail2 extends AppCompatActivity implements OnMapReadyCallback
         return path;
     }
 
+    @Override
+    public void onMapLongClick(LatLng latLng) {
+
+        if(layout1.getVisibility()==View.INVISIBLE)
+        {
+            mGoogleMap.addMarker(new MarkerOptions().position(latLng).title("체크포인트").icon(BitmapDescriptorFactory.fromResource(R.drawable.check)));
+            layout1.setVisibility(View.VISIBLE);
+            ck1lat=latLng.latitude;
+            ck2lat=latLng.longitude;
+            adr1.setText(getCurrentAddress(latLng));
+        }
+
+        else if(layout2.getVisibility()==View.INVISIBLE)
+        {
+            mGoogleMap.addMarker(new MarkerOptions().position(latLng).title("체크포인트").icon(BitmapDescriptorFactory.fromResource(R.drawable.check)));
+            layout2.setVisibility(View.VISIBLE);
+            ck2lat=latLng.latitude;
+            ck2lat=latLng.longitude;
+            adr2.setText(getCurrentAddress(latLng));
+        }
+
+    }
+
+    public String getCurrentAddress(LatLng latlng) {
+
+        //지오코더... GPS를 주소로 변환
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+
+        List<Address> addresses;
+
+        try {
+
+            addresses = geocoder.getFromLocation(
+                    latlng.latitude,
+                    latlng.longitude,
+                    1);
+        } catch (IOException ioException) {
+            //네트워크 문제
+            Toast.makeText(this, "지오코더 서비스 사용불가", Toast.LENGTH_LONG).show();
+            return "지오코더 서비스 사용불가";
+        } catch (IllegalArgumentException illegalArgumentException) {
+            Toast.makeText(this, "잘못된 GPS 좌표", Toast.LENGTH_LONG).show();
+            return "잘못된 GPS 좌표";
+
+        }
+
+
+        if (addresses == null || addresses.size() == 0) {
+            Toast.makeText(this, "주소 미발견", Toast.LENGTH_LONG).show();
+            return "주소 미발견";
+
+        } else {
+            Address address = addresses.get(0);
+            return address.getAddressLine(0).toString();
+        }
+
+    }
 
     private class DownloadTask extends AsyncTask<String, Void, String> {
 
