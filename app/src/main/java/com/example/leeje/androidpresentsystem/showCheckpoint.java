@@ -85,7 +85,7 @@ public class showCheckpoint extends AppCompatActivity implements OnMapReadyCallb
         mGoogleMap = googleMap;
 
         IconGenerator iconFactory=new IconGenerator(this);
-
+//
         MarkerOptions ck1 = new MarkerOptions();
         ck1.position(new LatLng(ck1lat, ck1lon))
                 //  .title("체크포인트1")
