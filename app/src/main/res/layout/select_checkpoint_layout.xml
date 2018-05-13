@@ -13,17 +13,22 @@
         tools:ignore="MissingConstraints">
 
 
-        <ImageView
-            android:id="@+id/imageView"
+        <fragment
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
-            android:layout_height="375dp"
-            android:layout_gravity="right"
-            app:srcCompat="@drawable/ic_launcher_background" />
+            android:layout_height="0dp"
+            android:layout_weight="8"
+            tools:context="com.example.leeje.androidpresentsystem.makeDetail2" />
+
 
         <LinearLayout
+            android:id="@+id/layout1"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:orientation="horizontal"
+            android:visibility="invisible">
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -46,9 +51,47 @@
             </LinearLayout>
 
             <TextView
+                android:id="@+id/adr1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="주소"
+                android:textAlignment="center"
+                android:textSize="24sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:id="@+id/layout2"
+            android:layout_weight="2"
+            android:orientation="horizontal"
+            android:visibility="invisible">
+
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="8"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/imageView"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    app:srcCompat="@drawable/check" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="2"
+                    android:textAlignment="center" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/adr2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:text="주소"
                 android:textAlignment="center"
                 android:textSize="24sp" />
@@ -58,10 +101,11 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="0dp"
+            android:layout_weight="2">
 
             <Button
-                android:id="@+id/button3"
+                android:id="@+id/next1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
@@ -69,11 +113,11 @@
                 android:text="다음" />
 
             <Button
-                android:id="@+id/button2"
+                android:id="@+id/pre"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
-                android:layout_alignTop="@+id/button3"
+                android:layout_alignTop="@+id/next1"
                 android:text="이전" />
         </RelativeLayout>
 
