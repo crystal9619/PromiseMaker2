@@ -39,6 +39,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.IOException;
 import java.util.List;
@@ -50,6 +52,10 @@ public class MakeDetail extends AppCompatActivity
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener, GoogleMap.OnMapClickListener, GoogleMap.OnMapLongClickListener {
+
+
+    private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+    private DatabaseReference databaseReference = firebaseDatabase.getReference();
 
 
     private Button next;
@@ -618,6 +624,9 @@ public class MakeDetail extends AppCompatActivity
         mGoogleMap.addMarker(new MarkerOptions().position(latLng).title("출발지").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
         dep.setText(getCurrentAddress(latLng));
         departure=latLng;
+        databaseReference.child("start").child("lat").setValue(departure.latitude);
+        databaseReference.child("start").child("lon").setValue(departure.longitude);
+
 
     }
 

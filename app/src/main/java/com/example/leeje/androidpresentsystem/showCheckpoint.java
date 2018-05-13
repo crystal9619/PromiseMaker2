@@ -1,6 +1,9 @@
 package com.example.leeje.androidpresentsystem;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,22 +17,52 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
 
 public class showCheckpoint extends AppCompatActivity implements OnMapReadyCallback {
 
-    private TextView adr;
+    Double ck1lat;
+    Double ck1lon;
+    Double ck2lat;
+    Double ck2lon;
+    private GoogleMap mGoogleMap;
+    private TextView adr1;
+    private TextView adr2;
+    private TextView adr3;
+    private TextView time1;
+    private TextView time2;
+    private TextView time3;
     private Button next;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.show_checkpoint_list_layout);
 
-        adr=(TextView) findViewById(R.id.adr);
-        next=(Button) findViewById(R.id.button);
+        Intent intent = getIntent();
+        ck1lat = intent.getDoubleExtra("ck1lat", 0);
+        ck1lon = intent.getDoubleExtra("ck1lon", 0);
+        ck2lat = intent.getDoubleExtra("ck2lat", 0);
+        ck2lon = intent.getDoubleExtra("ck2lon", 0);
+
+        adr1 = (TextView) findViewById(R.id.adr1);
+        adr2 = (TextView) findViewById(R.id.adr2);
+        adr3 = (TextView) findViewById(R.id.adr3);
+        time1 = (TextView) findViewById(R.id.time1);
+        time2 = (TextView) findViewById(R.id.time2);
+        time3 = (TextView) findViewById(R.id.time3);
+        next = (Button) findViewById(R.id.button);
 
         next.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -46,50 +79,56 @@ public class showCheckpoint extends AppCompatActivity implements OnMapReadyCallb
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        googleMap = googleMap;
+        mGoogleMap = googleMap;
 
-        // 시작위치 지정하기
-        LatLng seoul = new LatLng(37.550947, 126.989296);
-        googleMap.addMarker(new MarkerOptions().position(seoul).title("서울월"));
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(seoul));
 
-        //줌 애니메이션
-        CameraUpdate zoom = CameraUpdateFactory.zoomTo(15);
-        googleMap.animateCamera(zoom);
+        MarkerOptions start = new MarkerOptions();
+        start.position(new LatLng(ck1lat, ck1lat))
+                .title("체크포인트")
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.check));
+        mGoogleMap.addMarker(start).showInfoWindow();
 
-        //마커 표시하기
-        MarkerOptions marker = new MarkerOptions();
-        marker.position(new LatLng(37.555744, 126.970431))
-                .title("서울앙")
-                .snippet("Seoul Station");//부제
-        googleMap.addMarker(marker).showInfoWindow();
+        MarkerOptions end = new MarkerOptions();
+        end.position(new LatLng(ck2lat, ck2lon))
+                .title("체크포인트2")
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.check));
+        mGoogleMap.addMarker(end).showInfoWindow();
 
-        //자신의 위치
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
+
+    }
+
+    public String getCurrentAddress(LatLng latlng) {
+
+        //지오코더... GPS를 주소로 변환
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+
+        List<Address> addresses;
+
+        try {
+
+            addresses = geocoder.getFromLocation(
+                    latlng.latitude,
+                    latlng.longitude,
+                    1);
+        } catch (IOException ioException) {
+            //네트워크 문제
+            Toast.makeText(this, "지오코더 서비스 사용불가", Toast.LENGTH_LONG).show();
+            return "지오코더 서비스 사용불가";
+        } catch (IllegalArgumentException illegalArgumentException) {
+            Toast.makeText(this, "잘못된 GPS 좌표", Toast.LENGTH_LONG).show();
+            return "잘못된 GPS 좌표";
+
         }
-        googleMap.setMyLocationEnabled(true);
 
 
-        //이벤트 처리하기
-        googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker) {
-                Toast.makeText(getApplicationContext(), marker.getTitle() + "를 클릭했습니다.", Toast.LENGTH_SHORT).show();
-                adr.setText(marker.getTitle());
-                return false;
-            }
-        });
+        if (addresses == null || addresses.size() == 0) {
+            Toast.makeText(this, "주소 미발견", Toast.LENGTH_LONG).show();
+            return "주소 미발견";
 
-
-
+        } else {
+            Address address = addresses.get(0);
+            return address.getAddressLine(0).toString();
+        }
 
     }
 }
