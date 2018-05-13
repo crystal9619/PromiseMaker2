@@ -24,6 +24,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
+import com.google.maps.android.ui.IconGenerator;
 
 import java.io.IOException;
 import java.util.List;
@@ -31,6 +32,8 @@ import java.util.Locale;
 
 public class showCheckpoint extends AppCompatActivity implements OnMapReadyCallback {
 
+    Double endlat=37.450890;
+    Double endlon=126.656827;
     Double ck1lat;
     Double ck1lon;
     Double ck2lat;
@@ -81,19 +84,34 @@ public class showCheckpoint extends AppCompatActivity implements OnMapReadyCallb
     public void onMapReady(GoogleMap googleMap) {
         mGoogleMap = googleMap;
 
+        IconGenerator iconFactory=new IconGenerator(this);
 
-        MarkerOptions start = new MarkerOptions();
-        start.position(new LatLng(ck1lat, ck1lat))
-                .title("체크포인트")
+        MarkerOptions ck1 = new MarkerOptions();
+        ck1.position(new LatLng(ck1lat, ck1lon))
+                //  .title("체크포인트1")
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.check));
-        mGoogleMap.addMarker(start).showInfoWindow();
+        mGoogleMap.addMarker(ck1).showInfoWindow();
 
-        MarkerOptions end = new MarkerOptions();
-        end.position(new LatLng(ck2lat, ck2lon))
-                .title("체크포인트2")
+        MarkerOptions ck2 = new MarkerOptions();
+        ck2.position(new LatLng(ck2lat, ck2lon))
+                //  .title("체크포인트2")
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.check));
-        mGoogleMap.addMarker(end).showInfoWindow();
+        mGoogleMap.addMarker(ck2).showInfoWindow();
 
+        MarkerOptions ck1txt = new MarkerOptions();
+        ck1txt.position(new LatLng(ck1lat+0.0015, ck1lon))
+                //  .title("체크포인트1")
+                .icon(BitmapDescriptorFactory.fromBitmap(iconFactory.makeIcon("체크포인트1")));
+        mGoogleMap.addMarker(ck1txt).showInfoWindow();
+
+        MarkerOptions ck2txt = new MarkerOptions();
+        ck2txt.position(new LatLng(ck2lat+0.0015, ck2lon))
+                //  .title("체크포인트2")
+                .icon(BitmapDescriptorFactory.fromBitmap(iconFactory.makeIcon("체크포인트2")));
+        mGoogleMap.addMarker(ck2txt).showInfoWindow();
+
+        adr2.setText(getCurrentAddress(ck1.getPosition()));
+        adr3.setText(getCurrentAddress(ck2.getPosition()));
 
     }
 
