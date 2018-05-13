@@ -59,12 +59,10 @@ import static java.lang.Thread.State.TERMINATED;
 
 public class makeDetail2 extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener{
 
-    private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-    private DatabaseReference databaseReference = firebaseDatabase.getReference();
-
-
     private GoogleMap mGoogleMap = null;
 
+    private FirebaseDatabase database = FirebaseDatabase.getInstance();
+    private DatabaseReference databaseRef = database.getReference();
     private LinearLayout layout1;
     private LinearLayout layout2;
     TextView adr1;
@@ -89,23 +87,12 @@ public class makeDetail2 extends AppCompatActivity implements OnMapReadyCallback
         layout2=(LinearLayout) findViewById(R.id.layout2);
 
         Intent intent =getIntent();
-    //    lat= intent.getDoubleExtra("lat",0);
-      //  lon = intent.getDoubleExtra("lon",0);
 
-        databaseReference.child("start").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                /*
-                DataSnapshot ss= dataSnapshot.getChildren();
-                ss.child("")
-                */
-            }
+        //  lat= intent.getDoubleExtra("lat",0);
+        //  lon = intent.getDoubleExtra("lon",0);
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
+        Log.e("??","ㅠㅠ");
 
-            }
-        });
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -142,64 +129,8 @@ public class makeDetail2 extends AppCompatActivity implements OnMapReadyCallback
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        mGoogleMap = googleMap;
-        mGoogleMap.setOnMapLongClickListener(this);
-        DownloadTask downloadTask = new DownloadTask();
-        String url = "https://maps.googleapis.com/maps/api/directions/json?origin="+Double.toString(lat)+","+Double.toString(lon)+"&destination="+Double.toString(endlat)+","+Double.toString(endlon)+"&mode=transit&key=AIzaSyDdDWNDyd7YM9RRTdCa10ha3PhIOPScqQA";
-       Log.d("??",url);
-        String result="";
-       String route="";
-        try {
-            result=downloadTask.execute(url).get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
+        readData(googleMap);
 
-        try {
-            JSONObject jsonObject=null;
-            jsonObject=new JSONObject(result);
-            route=jsonObject.getJSONArray("routes").getJSONObject(0).getJSONObject("overview_polyline").getString("points");
-        } catch (JSONException e) {
-            Log.d("??","오류오류");
-        }
-
-        List<LatLng> poly;
-
-        poly=decode(route);
-
-
-        Log.d("??", Integer.toString(poly.size()));
-        PolylineOptions polyoption = new PolylineOptions();
-        polyoption.geodesic(true);
-        for(int i=0;i<poly.size();i++)
-        {
-            Log.d("??",Double.toString(poly.get(i).latitude));
-            polyoption.add(poly.get(i));
-        }
-
-        polyoption.width(10);
-        polyoption.color(Color.RED);
-        mGoogleMap.addPolyline(polyoption);
-
-        // 시작위치 지정하기
-
-        mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(lat,lon)));
-
-        //줌 애니메이션
-        CameraUpdate zoom = CameraUpdateFactory.zoomTo(15);
-        mGoogleMap.animateCamera(zoom);
-
-        //마커 표시하기
-        MarkerOptions start = new MarkerOptions();
-        start.position(new LatLng(lat, lon))
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_map_start));
-        mGoogleMap.addMarker(start).showInfoWindow();
-
-        MarkerOptions end = new MarkerOptions();
-        end.position(new LatLng(endlat,endlon)).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_map_arrive));
-        mGoogleMap.addMarker(end).showInfoWindow();
 
 
     }
@@ -248,7 +179,7 @@ public class makeDetail2 extends AppCompatActivity implements OnMapReadyCallback
             mGoogleMap.addMarker(new MarkerOptions().position(latLng).title("체크포인트").icon(BitmapDescriptorFactory.fromResource(R.drawable.check)));
             layout1.setVisibility(View.VISIBLE);
             ck1lat=latLng.latitude;
-            ck2lat=latLng.longitude;
+            ck1lon=latLng.longitude;
             adr1.setText(getCurrentAddress(latLng));
         }
 
@@ -257,7 +188,7 @@ public class makeDetail2 extends AppCompatActivity implements OnMapReadyCallback
             mGoogleMap.addMarker(new MarkerOptions().position(latLng).title("체크포인트").icon(BitmapDescriptorFactory.fromResource(R.drawable.check)));
             layout2.setVisibility(View.VISIBLE);
             ck2lat=latLng.latitude;
-            ck2lat=latLng.longitude;
+            ck2lon=latLng.longitude;
             adr2.setText(getCurrentAddress(latLng));
         }
 
@@ -360,5 +291,85 @@ public class makeDetail2 extends AppCompatActivity implements OnMapReadyCallback
         return data;
     }
 
+    public void readData(final GoogleMap googleMap)
+    {
+        databaseRef.child("start").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                lat=dataSnapshot.child("lat").getValue(Double.class);
+                lon=dataSnapshot.child("lon").getValue(Double.class);
+                Log.e("??","데이터 넣는중...");
+                mapOperation(googleMap);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e("???","에러발생");
+            }
+        });
+
+    }
+
+    public void mapOperation(GoogleMap googleMap)
+    {
+        mGoogleMap = googleMap;
+        mGoogleMap.setOnMapLongClickListener(this);
+        DownloadTask downloadTask = new DownloadTask();
+        String url = "https://maps.googleapis.com/maps/api/directions/json?origin="+Double.toString(lat)+","+Double.toString(lon)+"&destination="+Double.toString(endlat)+","+Double.toString(endlon)+"&mode=transit&key=AIzaSyDdDWNDyd7YM9RRTdCa10ha3PhIOPScqQA";
+        Log.d("??",url);
+        String result="";
+        String route="";
+        try {
+            result=downloadTask.execute(url).get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            JSONObject jsonObject=null;
+            jsonObject=new JSONObject(result);
+            route=jsonObject.getJSONArray("routes").getJSONObject(0).getJSONObject("overview_polyline").getString("points");
+        } catch (JSONException e) {
+            Log.d("??","오류오류");
+        }
+
+        List<LatLng> poly;
+
+        poly=decode(route);
+
+        Log.d("??", Integer.toString(poly.size()));
+        PolylineOptions polyoption = new PolylineOptions();
+        polyoption.geodesic(true);
+        for(int i=0;i<poly.size();i++)
+        {
+            Log.d("??",Double.toString(poly.get(i).latitude));
+            polyoption.add(poly.get(i));
+        }
+
+        polyoption.width(10);
+        polyoption.color(Color.RED);
+        mGoogleMap.addPolyline(polyoption);
+
+        // 시작위치 지정하기
+
+        //마커 표시하기
+        MarkerOptions start = new MarkerOptions();
+        start.position(new LatLng(lat, lon))
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_map_start));
+        mGoogleMap.addMarker(start).showInfoWindow();
+
+        MarkerOptions end = new MarkerOptions();
+        end.position(new LatLng(endlat,endlon)).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_map_arrive));
+        mGoogleMap.addMarker(end).showInfoWindow();
+
+        mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(lat,lon)));
+
+        //줌 애니메이션
+        CameraUpdate zoom = CameraUpdateFactory.zoomTo(15);
+        mGoogleMap.animateCamera(zoom);
+
+    }
 
 }
