@@ -21,6 +21,8 @@
         </activity>
         <activity android:name=".MakeDetail"></activity>
         <activity android:name=".ListOnline"></activity>
+        <activity android:name=".firstgroupActivity"></activity>
+        <activity android:name=".groupActivity"></activity>
     </application>
 
 </manifest>

@@ -12,7 +12,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.widget.Button;
-
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DatabaseReference;
 
@@ -20,6 +19,7 @@ public class ListOnline extends AppCompatActivity {
 
     Button detail;
     Button show;
+    Button group;
 
     //firebase
     DatabaseReference onlineRef,currentUserRef, counterRef;
@@ -58,6 +58,14 @@ public class ListOnline extends AppCompatActivity {
             }
         });
 
+        group = (Button) findViewById(R.id.groupMake);
+        group.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(),firstgroupActivity.class);
+                startActivity(intent);
+            }
+        });
 
         //set toolbar and logout/join menu
         Toolbar toolbar=(Toolbar)findViewById(R.id.toolBar);

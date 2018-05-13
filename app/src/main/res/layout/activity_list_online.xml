@@ -40,5 +40,14 @@
         android:layout_marginTop="52dp"
         android:text="약속화면" />
 
+    <Button
+        android:id="@+id/groupMake"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/mainMap"
+        android:layout_marginTop="52dp"
+        android:text="그룹만들기"
+        />
+
 
 </RelativeLayout>
