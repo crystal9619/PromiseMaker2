@@ -627,7 +627,6 @@ public class MakeDetail extends AppCompatActivity
         databaseReference.child("start").child("lat").setValue(departure.latitude);
         databaseReference.child("start").child("lon").setValue(departure.longitude);
 
-
     }
 
     @Override

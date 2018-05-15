@@ -339,7 +339,6 @@ public class makeDetail2 extends AppCompatActivity implements OnMapReadyCallback
 
         poly=decode(route);
 
-        Log.d("??", Integer.toString(poly.size()));
         PolylineOptions polyoption = new PolylineOptions();
         polyoption.geodesic(true);
         for(int i=0;i<poly.size();i++)
@@ -364,11 +363,11 @@ public class makeDetail2 extends AppCompatActivity implements OnMapReadyCallback
         end.position(new LatLng(endlat,endlon)).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_map_arrive));
         mGoogleMap.addMarker(end).showInfoWindow();
 
-        mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(lat,lon)));
+        mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(start.getPosition(),12));
 
         //줌 애니메이션
-        CameraUpdate zoom = CameraUpdateFactory.zoomTo(15);
-        mGoogleMap.animateCamera(zoom);
+        //CameraUpdate zoom = CameraUpdateFactory.zoomTo(15);
+        //mGoogleMap.animateCamera(zoom);
 
     }
 
