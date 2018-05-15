@@ -54,7 +54,7 @@ public class ListOnline extends AppCompatActivity {
         show.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(),MapsActivity.class);
+                Intent intent = new Intent(getApplicationContext(),main_location.class);
                 startActivity(intent);
 
             }
