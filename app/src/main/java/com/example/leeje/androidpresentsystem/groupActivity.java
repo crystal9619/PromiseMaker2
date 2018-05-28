@@ -1,6 +1,8 @@
 package com.example.leeje.androidpresentsystem;
 
+import android.net.Uri;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,11 +17,20 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+
+import com.google.android.gms.appinvite.AppInviteInvitation;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.appinvite.FirebaseAppInvite;
+import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
+import com.google.firebase.dynamiclinks.PendingDynamicLinkData;
 /**
  * Created by leeje on 2018-05-11.
  */
 
-public class groupActivity extends AppCompatActivity{
+public class groupActivity extends AppCompatActivity {
 
         private String CHAT_NAME;
         private String USER_NAME;
@@ -27,10 +38,11 @@ public class groupActivity extends AppCompatActivity{
         private ListView chat_view;
         private EditText chat_edit;
         private Button chat_send;
+        private Button invite;
 
         private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         private DatabaseReference databaseReference = firebaseDatabase.getReference();
-
+        private static final String TAG = "groupActivity";
         @Override
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
@@ -39,6 +51,7 @@ public class groupActivity extends AppCompatActivity{
             chat_view = (ListView) findViewById(R.id.chat_view);
             chat_edit = (EditText) findViewById(R.id.chat_edit);
             chat_send = (Button) findViewById(R.id.chat_sent);
+            invite=(Button)findViewById(R.id.invite_btn);
 
             Intent intent = getIntent();
             CHAT_NAME = intent.getStringExtra("chatName");
@@ -58,6 +71,35 @@ public class groupActivity extends AppCompatActivity{
 
                 }
             });
+
+            FirebaseDynamicLinks.getInstance().getDynamicLink(getIntent())
+                    .addOnSuccessListener(this, new OnSuccessListener<PendingDynamicLinkData>() {
+                        @Override
+                        public void onSuccess(PendingDynamicLinkData data) {
+                            if (data == null) {
+                                Log.d(TAG, "getInvitation: no data");
+                                return;
+                            }
+
+                            // Get the deep link
+                            Uri deepLink = data.getLink();
+
+                            // Extract invite
+                            FirebaseAppInvite invite = FirebaseAppInvite.getInvitation(data);
+                            if (invite != null) {
+                                String invitationId = invite.getInvitationId();
+                            }
+
+                            // Handle the deep link
+                            // ...
+                        }
+                    })
+                    .addOnFailureListener(this, new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.w(TAG, "getDynamicLink:onFailure", e);
+                        }
+                    });
         }
 
         private void addMessage(DataSnapshot dataSnapshot, ArrayAdapter<String> adapter) {
@@ -106,4 +148,35 @@ public class groupActivity extends AppCompatActivity{
                 }
             });
         }
+
+
+
+        private void onInviteClicked () {
+        Intent intent = new AppInviteInvitation.IntentBuilder(getString(R.string.invitation_title))
+                .setMessage(getString(R.string.invitation_message))
+                .setDeepLink(Uri.parse(getString(R.string.invitation_deep_link)))
+                .setCustomImage(Uri.parse(getString(R.string.invitation_custom_image)))
+                .setCallToActionText(getString(R.string.invitation_cta))
+                .build();
+        startActivityForResult(intent, REQUEST_INVITE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.d(TAG, "onActivityResult: requestCode=" + requestCode + ", resultCode=" + resultCode);
+
+        if (requestCode == REQUEST_INVITE) {
+            if (resultCode == RESULT_OK) {
+                // Get the invitation IDs of all sent messages
+                String[] ids = AppInviteInvitation.getInvitationIds(resultCode, data);
+                for (String id : ids) {
+                    Log.d(TAG, "onActivityResult: sent invitation " + id);
+                }
+            } else {
+                // Sending failed or it was canceled, show failure message to the user
+                // ...
+            }
+        }
+    }
 }
