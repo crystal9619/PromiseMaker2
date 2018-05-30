@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -52,6 +53,7 @@ import java.util.concurrent.ExecutionException;
 public class showCheckpoint extends AppCompatActivity implements OnMapReadyCallback {
 
     private long ar_time=1526827410;
+    long unixSeconds;
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
     private DatabaseReference databaseRef = database.getReference();
     Double endlat=37.450890;
@@ -62,6 +64,7 @@ public class showCheckpoint extends AppCompatActivity implements OnMapReadyCallb
     Double ck1lon;
     Double ck2lat;
     Double ck2lon;
+    int flag=0;
     private GoogleMap mGoogleMap;
     private TextView adr1;
     private TextView adr2;
@@ -170,7 +173,6 @@ public class showCheckpoint extends AppCompatActivity implements OnMapReadyCallb
     }
     public void mapOperation (GoogleMap googleMap)
     {
-
         IconGenerator iconFactory=new IconGenerator(this);
 //
         MarkerOptions ck1 = new MarkerOptions();
@@ -211,69 +213,149 @@ public class showCheckpoint extends AppCompatActivity implements OnMapReadyCallb
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_map_start));
         mGoogleMap.addMarker(start);
 
-
         mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(startlat,startlon),13));
         adr1.setText(getCurrentAddress(new LatLng(startlat,startlon)));
 
-        urlTask url = new urlTask();
-        String timetxt1= null;
+        urlTask url3 = new urlTask();
+        String timetxt3= null;
+        unixSeconds=ar_time;
         try {
-            timetxt1 = url.execute(startlat,startlon,1.0).get();
+            timetxt3 = url3.execute(ck2lat,ck2lon,endlat,endlon).get();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
 
-        long unixSeconds = Long.parseLong(timetxt1);
-        Date date = new Date(unixSeconds*1000L);
+        if(flag==1)
+        {
+            flag=0;
 
-        SimpleDateFormat hour = new SimpleDateFormat("hh");
-        SimpleDateFormat minute = new SimpleDateFormat("mm");
-        String formattedDate = hour.format(date)+"시 "+minute.format(date)+"분";
+            unixSeconds=unixSeconds-Long.parseLong(timetxt3)*60;
 
-        time1.setText(formattedDate);
+            Date date = new Date(unixSeconds*1000L);
 
+            SimpleDateFormat hour = new SimpleDateFormat("hh");
+            SimpleDateFormat minute = new SimpleDateFormat("mm");
+            String formattedDate = hour.format(date)+"시 "+minute.format(date)+"분";
+
+            time3.setText(formattedDate);
+
+        }
+//1527496740
+//1527496800
+        else
+        {
+            unixSeconds = Long.parseLong(timetxt3);
+            Date date = new Date(unixSeconds*1000L);
+
+            SimpleDateFormat hour = new SimpleDateFormat("hh");
+            SimpleDateFormat minute = new SimpleDateFormat("mm");
+            String formattedDate = hour.format(date)+"시 "+minute.format(date)+"분";
+
+            time3.setText(formattedDate);
+
+        }
 
         urlTask url2 = new urlTask();
         String timetxt2= null;
         try {
-            timetxt2 = url2.execute(ck1lat,ck1lon,1.1).get();
+            timetxt2 = url2.execute(ck1lat,ck1lon,ck2lat,ck2lon).get();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
 
-        unixSeconds = Long.parseLong(timetxt2);
-        date = new Date(ar_time*1000L-unixSeconds*1000L);
+        if(flag==1)
+        {
+            flag=0;
 
-        hour = new SimpleDateFormat("hh");
-        minute = new SimpleDateFormat("mm");
-        formattedDate = hour.format(date)+"시 "+minute.format(date)+"분";
+            unixSeconds=unixSeconds-Long.parseLong(timetxt2)*60;
 
-        time2.setText(formattedDate);
+            Date date = new Date(unixSeconds*1000L);
 
-        urlTask url3 = new urlTask();
-        String timetxt3= null;
+            SimpleDateFormat hour = new SimpleDateFormat("hh");
+            SimpleDateFormat minute = new SimpleDateFormat("mm");
+            String formattedDate = hour.format(date)+"시 "+minute.format(date)+"분";
+
+            time2.setText(formattedDate);
+
+        }
+
+        else
+        {
+            unixSeconds = Long.parseLong(timetxt2);
+            Date date = new Date(unixSeconds*1000L);
+
+            SimpleDateFormat hour = new SimpleDateFormat("hh");
+            SimpleDateFormat minute = new SimpleDateFormat("mm");
+            String formattedDate = hour.format(date)+"시 "+minute.format(date)+"분";
+
+            time2.setText(formattedDate);
+
+        }
+
+
+
+
+        urlTask url = new urlTask();
+        String timetxt1= null;
         try {
-            timetxt3 = url3.execute(ck2lat,ck2lon,1.1).get();
+            timetxt1 = url.execute(startlat,startlon,ck1lat,ck1lon).get();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
 
-        unixSeconds = Long.parseLong(timetxt3);
-        date = new Date(ar_time*1000L-unixSeconds*1000L);
+        if(flag==1)
+        {
+            flag=0;
 
-        hour = new SimpleDateFormat("hh");
-        minute = new SimpleDateFormat("mm");
-        formattedDate = hour.format(date)+"시 "+minute.format(date)+"분";
+            unixSeconds=unixSeconds-Long.parseLong(timetxt1)*60;
 
-        time3.setText(formattedDate);
+            Date date = new Date(unixSeconds*1000L);
+
+            SimpleDateFormat hour = new SimpleDateFormat("hh");
+            SimpleDateFormat minute = new SimpleDateFormat("mm");
+            String formattedDate = hour.format(date)+"시 "+minute.format(date)+"분";
+
+            time1.setText(formattedDate);
+
+        }
+
+        else
+        {
+            unixSeconds = Long.parseLong(timetxt1);
+            Date date = new Date(unixSeconds*1000L);
+
+            SimpleDateFormat hour = new SimpleDateFormat("hh");
+            SimpleDateFormat minute = new SimpleDateFormat("mm");
+            String formattedDate = hour.format(date)+"시 "+minute.format(date)+"분";
+
+            time1.setText(formattedDate);
+
+        }
+
+
+
+
+
 
     }
+
+    // This function converts decimal degrees to radians
+    private static double deg2rad(double deg) {
+        return (deg * Math.PI / 180.0);
+    }
+
+    // This function converts radians to decimal degrees
+    private static double rad2deg(double rad) {
+        return (rad * 180 / Math.PI);
+    }
+
+
 
     private class urlTask extends AsyncTask<Double, Void, String> {
 
@@ -285,7 +367,7 @@ public class showCheckpoint extends AppCompatActivity implements OnMapReadyCallb
             // For storing data from web service
             try {
                 // Fetching the data from web service
-                data = downloadUrl(doubles[0],doubles[1],doubles[2]);
+                data = downloadUrl(doubles[0],doubles[1],doubles[2],doubles[3]);
             } catch (Exception e) {
                 Log.d("Background Task", e.toString());
             }
@@ -298,18 +380,52 @@ public class showCheckpoint extends AppCompatActivity implements OnMapReadyCallb
 
     }
 
-    private String downloadUrl(Double lat,Double lon,Double flag) throws IOException{
+    private String downloadUrl(Double lat,Double lon,Double enda, Double endo) throws IOException{
 
-        Document doc= Jsoup.connect("https://maps.googleapis.com/maps/api/directions/xml")
-                .data("origin",Double.toString(lat)+","+Double.toString(lon))
-                .data("destination",Double.toString(endlat)+","+Double.toString(endlon))
-                .data("mode","transit")
-                .data("arrival_time",Long.toString(ar_time))
-                .data("key","AIzaSyDdDWNDyd7YM9RRTdCa10ha3PhIOPScqQA")
-                .parser(Parser.xmlParser()).get();
+        Location a=new Location("a");
+        a.setLatitude(lat);
+        a.setLongitude(lon);
 
-        Log.e("??????",doc.select("leg departure_time text").last().text());
+        Location b=new Location("b");
+        b.setLatitude(enda);
+        b.setLongitude(endo);
 
+        float dist=a.distanceTo(b);
+
+        Log.e("??????",Float.toString(dist));
+
+        if(dist<=700)
+        {
+            flag=1;
+            Document doc2= Jsoup.connect("https://map.naver.com/findroute2/findWalkRoute.nhn")
+                    .data("call","route2")
+                    .data("output","xml")
+                    .data("coord_type","naver")
+                    .data("search","0")
+                    .data("start",Double.toString(lon)+","+Double.toString(lat)+",ㅋ")
+                    .data("destination",Double.toString(endo)+","+Double.toString(enda)+",ㅋ")
+                    .parser(Parser.xmlParser()).get();
+
+            Log.e("??",doc2.location());
+            Log.e("띠용",doc2.select("totalTime").text());
+            return doc2.select("totalTime").text();
+        }
+        else
+        {
+            Document doc= Jsoup.connect("https://maps.googleapis.com/maps/api/directions/xml")
+                    .data("origin",Double.toString(lat)+","+Double.toString(lon))
+                    .data("destination",Double.toString(enda)+","+Double.toString(endo))
+                    .data("mode","transit")
+                    .data("arrival_time",Long.toString(unixSeconds))
+                    .data("key","AIzaSyDdDWNDyd7YM9RRTdCa10ha3PhIOPScqQA")
+                    .parser(Parser.xmlParser()).get();
+
+            Log.e("여기 ㅜㅜ",doc.location());
+            Log.e("띠용",doc.select("leg departure_time text").last().text());
+            return doc.select("leg departure_time value").last().text();
+
+        }
+        /*
         if(flag==1.0)
         {
             return doc.select("leg departure_time value").last().text();
@@ -318,7 +434,7 @@ public class showCheckpoint extends AppCompatActivity implements OnMapReadyCallb
         {
             return  doc.select("leg duration value").last().text();
         }
-
+*/
         /*
 
         stemp안에 travel mode == transit 이라면면
