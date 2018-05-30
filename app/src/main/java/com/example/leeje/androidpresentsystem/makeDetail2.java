@@ -60,7 +60,7 @@ import static java.lang.Thread.State.TERMINATED;
 public class makeDetail2 extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener{
 
     private GoogleMap mGoogleMap = null;
-
+    private long ar_time=1526827410;
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
     private DatabaseReference databaseRef = database.getReference();
     private LinearLayout layout1;
@@ -315,7 +315,7 @@ public class makeDetail2 extends AppCompatActivity implements OnMapReadyCallback
         mGoogleMap = googleMap;
         mGoogleMap.setOnMapLongClickListener(this);
         DownloadTask downloadTask = new DownloadTask();
-        String url = "https://maps.googleapis.com/maps/api/directions/json?origin="+Double.toString(lat)+","+Double.toString(lon)+"&destination="+Double.toString(endlat)+","+Double.toString(endlon)+"&mode=transit&key=AIzaSyDdDWNDyd7YM9RRTdCa10ha3PhIOPScqQA";
+        String url = "https://maps.googleapis.com/maps/api/directions/json?origin="+Double.toString(lat)+","+Double.toString(lon)+"&destination="+Double.toString(endlat)+","+Double.toString(endlon)+"&mode=transit&arrival_time="+Long.toString(ar_time)+"&key=AIzaSyDdDWNDyd7YM9RRTdCa10ha3PhIOPScqQA";
         Log.d("??",url);
         String result="";
         String route="";
