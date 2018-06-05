@@ -29,11 +29,16 @@
             android:orientation="vertical">
 
             <Button
-                android:id="@+id/chat_sent"
+            android:id="@+id/chat_sent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="send" />
+
+            <Button
+                android:id="@+id/invite_btn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="send" />
-
+                android:text="초대하기"/>
             <EditText
                 android:id="@+id/chat_edit"
                 android:layout_width="match_parent"
