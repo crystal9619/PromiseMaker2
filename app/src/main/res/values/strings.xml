@@ -225,6 +225,12 @@
     <string name="style_choose">Choose style</string>
     <string name="style_set_to">Style set to: %1$s</string>
 
+    <!-- invite -->
+    <string name="invitation_title">invitation_title</string>
+    <string name="invitation_message">invitation_message</string>
+    <string name="invitation_deep_link">invitation_deep_link</string>
+    <string name="invitation_custom_image">invitation_custom_image</string>
+    <string name="invitation_cta">invitation_cta</string>
     <!--    Permissions    -->
     <string name="permission_rationale_location">Access to the location service is required to demonstrate the \'my location\' feature, which shows your current location on the map.</string>
     <string name="location_permission_denied">This sample requires location permission to enable the \'my location\' layer. Please try again and grant access to use the location.\nIf the permission has been permanently denied, it can be enabled from the System Settings &gt; Apps &gt; \'Google Maps API Demos\'.</string>

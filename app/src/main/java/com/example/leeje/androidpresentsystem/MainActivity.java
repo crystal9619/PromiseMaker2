@@ -3,6 +3,7 @@ package com.example.leeje.androidpresentsystem;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -40,8 +41,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void startNewActivity(int resultCode, Intent data){
         if(resultCode==RESULT_OK){
-            Intent intent = new Intent(MainActivity.this,ListOnline.class);
+            Intent intent = new Intent(MainActivity.this,makeName.class);
             startActivity(intent);
+            Log.v("태그","1번");
             finish();
         }
         else
