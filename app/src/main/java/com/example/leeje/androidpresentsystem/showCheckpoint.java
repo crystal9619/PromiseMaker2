@@ -52,7 +52,7 @@ import java.util.concurrent.ExecutionException;
 
 public class showCheckpoint extends AppCompatActivity implements OnMapReadyCallback {
 
-    private long ar_time=1526827410;
+    private long ar_time=1530367845;
     long unixSeconds;
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
     private DatabaseReference databaseRef = database.getReference();
