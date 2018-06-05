@@ -10,43 +10,25 @@ android:orientation="vertical"
 
     >
 
-<CalendarView
+    <DatePicker
+        android:id="@+id/calender"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="8" />
 
-    android:id="@+id/calendar"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="right"
+        android:orientation="vertical">
 
-    android:layout_width="match_parent"
-
-    android:layout_height="0px"
-
-    android:layout_weight="1"
-
-    />
-
-<CalendarView
-
-    android:layout_width="match_parent"
-
-    android:layout_height="0px"
-
-    android:layout_weight="1"
-
-    android:minDate="04/01/2013"
-
-    android:maxDate="12/31/2013"
-
-    android:focusedMonthDateColor="#ff0000"
-
-    android:unfocusedMonthDateColor="#0000ff"
-
-    android:selectedWeekBackgroundColor="#ffff00"
-
-    android:showWeekNumber="false"
-
-    android:weekSeparatorLineColor="#00ff00"
-
-    />
-
-
+        <Button
+            android:id="@+id/next"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="다음" />
+    </LinearLayout>
 
 </LinearLayout>
 

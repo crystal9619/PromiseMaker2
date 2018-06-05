@@ -1,11 +1,15 @@
 package com.example.leeje.androidpresentsystem;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -52,12 +56,12 @@ import java.util.concurrent.ExecutionException;
 
 public class showCheckpoint extends AppCompatActivity implements OnMapReadyCallback {
 
-    private long ar_time=1530367845;
+    private long ar_time;
     long unixSeconds;
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
     private DatabaseReference databaseRef = database.getReference();
-    Double endlat=37.450890;
-    Double endlon=126.656827;
+    Double endlat;
+    Double endlon;
     Double startlat;
     Double startlon;
     Double ck1lat;
@@ -100,6 +104,23 @@ public class showCheckpoint extends AppCompatActivity implements OnMapReadyCallb
         next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Calendar calendar = Calendar.getInstance();
+                calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DATE), calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND)+10);
+               Intent mAlarmIntent = new Intent(showCheckpoint.this,BroadcastD.class);
+               PendingIntent mPendingIntent = PendingIntent.getBroadcast(showCheckpoint.this,0,mAlarmIntent,0);
+                AlarmManager mAlarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+                if (Build.VERSION.SDK_INT >= 23)
+                    mAlarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), mPendingIntent);
+                else
+                {
+                    if ( Build.VERSION.SDK_INT >= 19)
+                        mAlarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), mPendingIntent);
+                    else
+                        mAlarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), mPendingIntent);
+
+                }
+
+
                 finish();
             }
         });
@@ -155,21 +176,22 @@ public class showCheckpoint extends AppCompatActivity implements OnMapReadyCallb
 
     public void readData(final GoogleMap googleMap)
     {
-        databaseRef.child("start").addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                startlat=dataSnapshot.child("lat").getValue(Double.class);
-                startlon=dataSnapshot.child("lon").getValue(Double.class);
-                Log.e("??","데이터 넣는중...");
-
+                startlat=dataSnapshot.child("start").child("lat").getValue(Double.class);
+                startlon=dataSnapshot.child("start").child("lon").getValue(Double.class);
+                ar_time=dataSnapshot.child("end").child("time").getValue(Long.class);
+                endlat=dataSnapshot.child("end").child("lat").getValue(Double.class);
+                endlon=dataSnapshot.child("end").child("lon").getValue(Double.class);
                 mapOperation(googleMap);
             }
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 Log.e("???","에러발생");
             }
         });
+
     }
     public void mapOperation (GoogleMap googleMap)
     {

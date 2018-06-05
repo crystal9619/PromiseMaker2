@@ -60,7 +60,7 @@ import static java.lang.Thread.State.TERMINATED;
 public class makeDetail2 extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener{
 
     private GoogleMap mGoogleMap = null;
-    private long ar_time=1530367845;
+    private long ar_time;
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
     private DatabaseReference databaseRef = database.getReference();
     private LinearLayout layout1;
@@ -71,8 +71,8 @@ public class makeDetail2 extends AppCompatActivity implements OnMapReadyCallback
     Double lon;
     Button pre;
     Button next;
-    Double endlat=37.450890;
-    Double endlon=126.656827;
+    Double endlat;
+    Double endlon;
     Double ck1lat;
     Double ck1lon;
     Double ck2lat;
@@ -293,20 +293,22 @@ public class makeDetail2 extends AppCompatActivity implements OnMapReadyCallback
 
     public void readData(final GoogleMap googleMap)
     {
-        databaseRef.child("start").addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                lat=dataSnapshot.child("lat").getValue(Double.class);
-                lon=dataSnapshot.child("lon").getValue(Double.class);
-                Log.e("??","데이터 넣는중...");
+                lat=dataSnapshot.child("start").child("lat").getValue(Double.class);
+                lon=dataSnapshot.child("start").child("lon").getValue(Double.class);
+                ar_time=dataSnapshot.child("end").child("time").getValue(Long.class);
+                endlat=dataSnapshot.child("end").child("lat").getValue(Double.class);
+                endlon=dataSnapshot.child("end").child("lon").getValue(Double.class);
                 mapOperation(googleMap);
             }
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 Log.e("???","에러발생");
             }
         });
+
 
     }
 
