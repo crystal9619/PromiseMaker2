@@ -12,18 +12,21 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.widget.Button;
+
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 public class ListOnline extends AppCompatActivity {
 
     Button detail;
     Button show;
     Button group;
-
+    Button promise;
     //firebase
-    DatabaseReference onlineRef,currentUserRef, counterRef;
-    FirebaseRecyclerAdapter<User,ListOnlineViewHolder> adapter;
+    DatabaseReference onlineRef, currentUserRef, counterRef;
+    FirebaseRecyclerAdapter<User, ListOnlineViewHolder> adapter;
     //View
 
     RecyclerView listOnline;
@@ -35,9 +38,9 @@ public class ListOnline extends AppCompatActivity {
         setContentView(R.layout.activity_list_online);
 
         //Init view
-        listOnline = (RecyclerView)findViewById(R.id.listOnline);
+        listOnline = (RecyclerView) findViewById(R.id.listOnline);
         listOnline.setHasFixedSize(true);
-        layoutManager=new LinearLayoutManager(this);
+        layoutManager = new LinearLayoutManager(this);
         listOnline.setLayoutManager(layoutManager);
 
         //임시공간
@@ -45,7 +48,7 @@ public class ListOnline extends AppCompatActivity {
         detail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(),MakeDetail.class);
+                Intent intent = new Intent(getApplicationContext(), MakeDetail.class);
                 startActivity(intent);
             }
         });
@@ -54,7 +57,7 @@ public class ListOnline extends AppCompatActivity {
         show.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(),main_location.class);
+                Intent intent = new Intent(getApplicationContext(), main_location.class);
                 startActivity(intent);
 
             }
@@ -64,13 +67,29 @@ public class ListOnline extends AppCompatActivity {
         group.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(),firstgroupActivity.class);
+                Intent intent = new Intent(getApplicationContext(), firstgroupActivity.class);
                 startActivity(intent);
             }
         });
 
+        promise = (Button) findViewById(R.id.promiseMake);
+        promise.setOnClickListener(new View.OnClickListener() {
+                                       @Override
+                                       public void onClick(View view) {
+                                           Intent intent = new Intent(getApplicationContext(), makedate.class);
+                                           startActivity(intent);
+                                       }
+                                   }
+
+
+        );
+
+
+        //       FirebaseMessaging.getInstance().subscribeToTopic("news");
+        //       FirebaseInstanceId.getInstance().getToken();
+
         //set toolbar and logout/join menu
-        Toolbar toolbar=(Toolbar)findViewById(R.id.toolBar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolBar);
         toolbar.setTitle("Promise Maker");
         setSupportActionBar(toolbar);
     }
@@ -78,7 +97,7 @@ public class ListOnline extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main_menu,menu);
+        inflater.inflate(R.menu.main_menu, menu);
         return true;
     }
 }

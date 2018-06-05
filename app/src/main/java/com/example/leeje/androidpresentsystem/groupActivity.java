@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -30,7 +31,8 @@ import com.google.firebase.dynamiclinks.PendingDynamicLinkData;
  * Created by leeje on 2018-05-11.
  */
 
-public class groupActivity extends AppCompatActivity {
+public class groupActivity extends AppCompatActivity implements
+        GoogleApiClient.OnConnectionFailedListener {
 
         private String CHAT_NAME;
         private String USER_NAME;
@@ -43,6 +45,7 @@ public class groupActivity extends AppCompatActivity {
         private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         private DatabaseReference databaseReference = firebaseDatabase.getReference();
         private static final String TAG = "groupActivity";
+        private static final int REQUEST_INVITE=0;
         @Override
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
@@ -52,6 +55,13 @@ public class groupActivity extends AppCompatActivity {
             chat_edit = (EditText) findViewById(R.id.chat_edit);
             chat_send = (Button) findViewById(R.id.chat_sent);
             invite=(Button)findViewById(R.id.invite_btn);
+
+            invite.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onInviteClicked();
+                }
+            });
 
             Intent intent = getIntent();
             CHAT_NAME = intent.getStringExtra("chatName");
@@ -155,7 +165,6 @@ public class groupActivity extends AppCompatActivity {
         Intent intent = new AppInviteInvitation.IntentBuilder(getString(R.string.invitation_title))
                 .setMessage(getString(R.string.invitation_message))
                 .setDeepLink(Uri.parse(getString(R.string.invitation_deep_link)))
-                .setCustomImage(Uri.parse(getString(R.string.invitation_custom_image)))
                 .setCallToActionText(getString(R.string.invitation_cta))
                 .build();
         startActivityForResult(intent, REQUEST_INVITE);
@@ -176,7 +185,22 @@ public class groupActivity extends AppCompatActivity {
             } else {
                 // Sending failed or it was canceled, show failure message to the user
                 // ...
+                Log.d(TAG,"Failed to send invitaiton");
             }
         }
+    }
+
+    //@Override
+    // public void onClick(View v) {
+      //  int i=v.getId();
+        //if(i==R.id.invite_btn){
+          //  onInviteClicked();
+        //}
+
+    //}
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Log.d(TAG,"onConnectionFailed:" + connectionResult);
     }
 }

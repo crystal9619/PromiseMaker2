@@ -48,6 +48,16 @@
         android:layout_marginTop="52dp"
         android:text="그룹만들기"
         />
+ake
+    <Button
+        android:id="@+id/promiseMake"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/mainMap"
+        android:layout_below="@+id/mainMap"
+        android:layout_marginStart="23dp"
+        android:layout_marginTop="13dp"
+        android:text="약속 만들기" />
 
 
 </RelativeLayout>

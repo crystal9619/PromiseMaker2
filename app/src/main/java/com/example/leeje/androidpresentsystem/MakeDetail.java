@@ -118,6 +118,7 @@ public class MakeDetail extends AppCompatActivity
 
                 List<Address> list=null;
                 String str=edit.getText().toString();
+                edit.setText("");
                 try {
                     list=geo.getFromLocationName(str,1);
                 } catch (IOException e) {

@@ -10,6 +10,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -22,6 +23,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,18 +41,15 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
 
-public class main_location extends AppCompatActivity
+public class makePosition extends AppCompatActivity
         implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
@@ -60,16 +59,15 @@ public class main_location extends AppCompatActivity
     private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     private DatabaseReference databaseReference = firebaseDatabase.getReference();
 
-    private TextView name1;
-    private TextView name2;
-    private TextView adr1;
-    private TextView adr2;
 
+    private EditText edit;
+    private Button search;
+    private Button next;
+    private TextView dep;
     private GoogleApiClient mGoogleApiClient = null;
     private GoogleMap mGoogleMap = null;
     private Marker currentMarker = null;
-    private Marker marker1=null;
-    private Marker marker2=null;
+
     private static final String TAG = "googlemap_example";
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 2002;
@@ -96,18 +94,50 @@ public class main_location extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.main_location_layout);
+        setContentView(R.layout.activity_makepromise_position);
 
+        edit = (EditText) findViewById(R.id.edit);
+        search = (Button) findViewById(R.id.searchButton);
+        dep = (TextView) findViewById(R.id.departure);
+        next = (Button) findViewById(R.id.next1);
+        final Geocoder geo = new Geocoder(this);
+        next.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                databaseReference.child("end").child("lat").setValue(departure.latitude);
+                databaseReference.child("end").child("lon").setValue(departure.longitude);
+                finish();
+            }
+        });
 
-        name1=(TextView) findViewById(R.id.name1);
-        name2=(TextView) findViewById(R.id.name2);
-        adr1=(TextView) findViewById(R.id.adr1);
-        adr2=(TextView) findViewById(R.id.adr2);
+        search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                List<Address> list = null;
+                String str = edit.getText().toString();
+                edit.setText("");
+                try {
+                    list = geo.getFromLocationName(str, 1);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                if (list != null) {
+                    if (list.size() == 0) {
+                    } else {
+                        LatLng search = new LatLng(list.get(0).getLatitude(), list.get(0).getLongitude());
+                        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(search, 18);
+                        mGoogleMap.moveCamera(cameraUpdate);
+                    }
+                }
+
+            }
+        });
 
 
         Log.d(TAG, "onCreate");
         mActivity = this;
-
 
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -152,10 +182,10 @@ public class main_location extends AppCompatActivity
 
             Log.d(TAG, "startLocationUpdates : call showDialogForLocationServiceSetting");
             showDialogForLocationServiceSetting();
-        }else {
+        } else {
 
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                    && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                    && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
                 Log.d(TAG, "startLocationUpdates : 퍼미션 안가지고 있음");
                 return;
@@ -173,14 +203,12 @@ public class main_location extends AppCompatActivity
     }
 
 
-
     private void stopLocationUpdates() {
 
-        Log.d(TAG,"stopLocationUpdates : LocationServices.FusedLocationApi.removeLocationUpdates");
+        Log.d(TAG, "stopLocationUpdates : LocationServices.FusedLocationApi.removeLocationUpdates");
         LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
         mRequestingLocationUpdates = false;
     }
-
 
 
     @Override
@@ -189,64 +217,6 @@ public class main_location extends AppCompatActivity
         Log.d(TAG, "onMapReady :");
 
         mGoogleMap = googleMap;
-
-        databaseReference.child("end").addListenerForSingleValueEvent(new ValueEventListener(){
-
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Double endlat=dataSnapshot.child("lat").getValue(Double.class);
-                Double endlon=dataSnapshot.child("lon").getValue(Double.class);
-                MarkerOptions end = new MarkerOptions();
-                end.position(new LatLng(endlat,endlon)).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_map_arrive));
-                mGoogleMap.addMarker(end).showInfoWindow();
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-
-
-        });
-
-        databaseReference.child("류경민").child("moving").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Double lat=dataSnapshot.child("moving_site_lat").getValue(Double.class);
-                Double lon=dataSnapshot.child("moving_site_lon").getValue(Double.class);
-                if(marker1!=null) marker1.remove();
-               marker1=mGoogleMap.addMarker(new MarkerOptions().position(new LatLng(lat,lon)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
-                name1.setText("류경민");
-                adr1.setText(getCurrentAddress(new LatLng(lat,lon)));
-                Log.e("??","데이터 넣는중...");
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.e("???","에러발생");
-            }
-        });
-
-
-        databaseReference.child("이지은").child("moving").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Double lat=dataSnapshot.child("moving_site_lat").getValue(Double.class);
-                Double lon=dataSnapshot.child("moving_site_lon").getValue(Double.class);
-                if(marker2!=null) marker2.remove();
-                marker2=mGoogleMap.addMarker(new MarkerOptions().position(new LatLng(lat,lon)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)));
-                name2.setText("이지은");
-                adr2.setText(getCurrentAddress(new LatLng(lat,lon)));
-                Log.e("??","데이터 넣는중...");
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.e("???","에러발생");
-            }
-        });
-
-
         mGoogleMap.setOnMapLongClickListener(this);
 
         //런타임 퍼미션 요청 대화상자나 GPS 활성 요청 대화상자 보이기전에
@@ -256,12 +226,12 @@ public class main_location extends AppCompatActivity
         //mGoogleMap.getUiSettings().setZoomControlsEnabled(false);
         mGoogleMap.getUiSettings().setMyLocationButtonEnabled(true);
         mGoogleMap.animateCamera(CameraUpdateFactory.zoomTo(15));
-        mGoogleMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener(){
+        mGoogleMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
 
             @Override
             public boolean onMyLocationButtonClick() {
 
-                Log.d( TAG, "onMyLocationButtonClick : 위치에 따른 카메라 이동 활성화");
+                Log.d(TAG, "onMyLocationButtonClick : 위치에 따른 카메라 이동 활성화");
                 mMoveMapByAPI = true;
                 return true;
             }
@@ -271,7 +241,7 @@ public class main_location extends AppCompatActivity
             @Override
             public void onMapClick(LatLng latLng) {
 
-                Log.d( TAG, "onMapClick :");
+                Log.d(TAG, "onMapClick :");
             }
         });
 
@@ -280,7 +250,7 @@ public class main_location extends AppCompatActivity
             @Override
             public void onCameraMoveStarted(int i) {
 
-                if (mMoveMapByUser == true && mRequestingLocationUpdates){
+                if (mMoveMapByUser == true && mRequestingLocationUpdates) {
 
                     Log.d(TAG, "onCameraMove : 위치에 따른 카메라 이동 비활성화");
                     mMoveMapByAPI = false;
@@ -306,11 +276,8 @@ public class main_location extends AppCompatActivity
     @Override
     public void onLocationChanged(Location location) {
 
-        databaseReference.child("박수정").child("moving").child("moving_site_lat").setValue(location.getLatitude());
-        databaseReference.child("박수정").child("moving").child("moving_site_lon").setValue(location.getLongitude());
-
         currentPosition
-                = new LatLng( location.getLatitude(), location.getLongitude());
+                = new LatLng(location.getLatitude(), location.getLongitude());
 
 
         Log.d(TAG, "onLocationChanged : ");
@@ -329,7 +296,7 @@ public class main_location extends AppCompatActivity
     @Override
     protected void onStart() {
 
-        if(mGoogleApiClient != null && mGoogleApiClient.isConnected() == false){
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected() == false) {
 
             Log.d(TAG, "onStart: mGoogleApiClient connect");
             mGoogleApiClient.connect();
@@ -347,7 +314,7 @@ public class main_location extends AppCompatActivity
             stopLocationUpdates();
         }
 
-        if ( mGoogleApiClient.isConnected()) {
+        if (mGoogleApiClient.isConnected()) {
 
             Log.d(TAG, "onStop : mGoogleApiClient disconnect");
             mGoogleApiClient.disconnect();
@@ -361,12 +328,12 @@ public class main_location extends AppCompatActivity
     public void onConnected(Bundle connectionHint) {
 
 
-        if ( mRequestingLocationUpdates == false ) {
+        if (mRequestingLocationUpdates == false) {
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
                 int hasFineLocationPermission = ContextCompat.checkSelfPermission(this,
-                        Manifest.permission.ACCESS_FINE_LOCATION);
+                        android.Manifest.permission.ACCESS_FINE_LOCATION);
 
                 if (hasFineLocationPermission == PackageManager.PERMISSION_DENIED) {
 
@@ -382,7 +349,7 @@ public class main_location extends AppCompatActivity
                     mGoogleMap.setMyLocationEnabled(true);
                 }
 
-            }else{
+            } else {
 
                 Log.d(TAG, "onConnected : call startLocationUpdates");
                 startLocationUpdates();
@@ -480,12 +447,12 @@ public class main_location extends AppCompatActivity
 //        currentMarker = mGoogleMap.addMarker(markerOptions);
 
 
-        if ( mMoveMapByAPI ) {
+        if (mMoveMapByAPI) {
 
-            Log.d( TAG, "setCurrentLocation :  mGoogleMap moveCamera "
-                    + location.getLatitude() + " " + location.getLongitude() ) ;
+            Log.d(TAG, "setCurrentLocation :  mGoogleMap moveCamera "
+                    + location.getLatitude() + " " + location.getLongitude());
             // CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(currentLatLng, 15);
-            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(currentLatLng,18);
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(currentLatLng, 18);
             mGoogleMap.moveCamera(cameraUpdate);
         }
     }
@@ -523,9 +490,9 @@ public class main_location extends AppCompatActivity
     private void checkPermissions() {
         boolean fineLocationRationale = ActivityCompat
                 .shouldShowRequestPermissionRationale(this,
-                        Manifest.permission.ACCESS_FINE_LOCATION);
+                        android.Manifest.permission.ACCESS_FINE_LOCATION);
         int hasFineLocationPermission = ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION);
+                android.Manifest.permission.ACCESS_FINE_LOCATION);
 
         if (hasFineLocationPermission == PackageManager
                 .PERMISSION_DENIED && fineLocationRationale)
@@ -540,7 +507,7 @@ public class main_location extends AppCompatActivity
 
             Log.d(TAG, "checkPermissions : 퍼미션 가지고 있음");
 
-            if ( mGoogleApiClient.isConnected() == false) {
+            if (mGoogleApiClient.isConnected() == false) {
 
                 Log.d(TAG, "checkPermissions : 퍼미션 가지고 있음");
                 mGoogleApiClient.connect();
@@ -561,12 +528,11 @@ public class main_location extends AppCompatActivity
             if (permissionAccepted) {
 
 
-                if ( mGoogleApiClient.isConnected() == false) {
+                if (mGoogleApiClient.isConnected() == false) {
 
                     Log.d(TAG, "onRequestPermissionsResult : mGoogleApiClient connect");
                     mGoogleApiClient.connect();
                 }
-
 
 
             } else {
@@ -580,7 +546,7 @@ public class main_location extends AppCompatActivity
     @TargetApi(Build.VERSION_CODES.M)
     private void showDialogForPermission(String msg) {
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(main_location.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(makePosition.this);
         builder.setTitle("알림");
         builder.setMessage(msg);
         builder.setCancelable(false);
@@ -602,7 +568,7 @@ public class main_location extends AppCompatActivity
 
     private void showDialogForPermissionSetting(String msg) {
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(main_location.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(makePosition.this);
         builder.setTitle("알림");
         builder.setMessage(msg);
         builder.setCancelable(true);
@@ -630,7 +596,7 @@ public class main_location extends AppCompatActivity
     //여기부터는 GPS 활성화를 위한 메소드들
     private void showDialogForLocationServiceSetting() {
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(main_location.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(makePosition.this);
         builder.setTitle("위치 서비스 비활성화");
         builder.setMessage("앱을 사용하기 위해서는 위치 서비스가 필요합니다.\n"
                 + "위치 설정을 수정하실래요?");
@@ -668,9 +634,9 @@ public class main_location extends AppCompatActivity
                         Log.d(TAG, "onActivityResult : 퍼미션 가지고 있음");
 
 
-                        if ( mGoogleApiClient.isConnected() == false ) {
+                        if (mGoogleApiClient.isConnected() == false) {
 
-                            Log.d( TAG, "onActivityResult : mGoogleApiClient connect ");
+                            Log.d(TAG, "onActivityResult : mGoogleApiClient connect ");
                             mGoogleApiClient.connect();
                         }
                         return;
@@ -683,11 +649,15 @@ public class main_location extends AppCompatActivity
 
     @Override
     public void onMapLongClick(LatLng latLng) {
-
+        mGoogleMap.addMarker(new MarkerOptions().position(latLng).title("도착지").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
+        dep.setText(getCurrentAddress(latLng));
+        departure = latLng;
     }
 
     @Override
     public void onMapClick(LatLng latLng) {
 
     }
+
+
 }
