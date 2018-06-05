@@ -10,6 +10,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -22,6 +23,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -58,6 +60,8 @@ public class MakeDetail extends AppCompatActivity
     private DatabaseReference databaseReference = firebaseDatabase.getReference();
 
 
+    private EditText edit;
+    private Button search;
     private Button next;
     private TextView dep;
     private GoogleApiClient mGoogleApiClient = null;
@@ -92,8 +96,11 @@ public class MakeDetail extends AppCompatActivity
 
         setContentView(R.layout.select_departure_layout);
 
+        edit=(EditText)findViewById(R.id.edit);
+        search=(Button) findViewById(R.id.searchButton);
         dep=(TextView) findViewById(R.id.departure);
         next=(Button) findViewById(R.id.next1);
+        final Geocoder geo = new Geocoder(this);
         next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -104,6 +111,34 @@ public class MakeDetail extends AppCompatActivity
                 finish();
             }
         });
+
+        search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                List<Address> list=null;
+                String str=edit.getText().toString();
+                try {
+                    list=geo.getFromLocationName(str,1);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                if(list!=null)
+                {
+                    if(list.size()==0)
+                    {}
+                    else
+                    {
+                        LatLng search=new LatLng(list.get(0).getLatitude(),list.get(0).getLongitude());
+                        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(search,18);
+                        mGoogleMap.moveCamera(cameraUpdate);
+                    }
+                }
+
+            }
+        });
+
 
         Log.d(TAG, "onCreate");
         mActivity = this;
@@ -633,4 +668,7 @@ public class MakeDetail extends AppCompatActivity
     public void onMapClick(LatLng latLng) {
 
     }
+
+
+
 }

@@ -60,7 +60,7 @@ import static java.lang.Thread.State.TERMINATED;
 public class makeDetail2 extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener{
 
     private GoogleMap mGoogleMap = null;
-    private long ar_time=1526827410;
+    private long ar_time=1530367845;
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
     private DatabaseReference databaseRef = database.getReference();
     private LinearLayout layout1;
