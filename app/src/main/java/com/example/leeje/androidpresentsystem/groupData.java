@@ -18,6 +18,7 @@ public class groupData {
         this.userName=userName;
     }
     public void setMessage(String message) {
+
         this.message = message;
     }
 

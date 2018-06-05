@@ -50,7 +50,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="도착지"
+                    android:text="출발"
                     android:textAlignment="center" />
 
             </LinearLayout>
@@ -62,7 +62,7 @@
                 android:layout_weight="10"
                 android:text="주소"
                 android:textAlignment="center"
-                android:textSize="24sp" />
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/time1"
@@ -71,7 +71,7 @@
                 android:layout_weight="2"
                 android:text="시간"
                 android:textAlignment="center"
-                android:textSize="24sp" />
+                android:textSize="14sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -110,16 +110,16 @@
                 android:layout_weight="10"
                 android:text="주소"
                 android:textAlignment="center"
-                android:textSize="24sp" />
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/time2"
-                android:layout_weight="2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_weight="2"
                 android:text="시간"
                 android:textAlignment="center"
-                android:textSize="24sp" />
+                android:textSize="14sp" />
 
         </LinearLayout>
 
@@ -159,16 +159,16 @@
                 android:layout_weight="10"
                 android:text="주소"
                 android:textAlignment="center"
-                android:textSize="24sp" />
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/time3"
-                android:layout_weight="2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_weight="2"
                 android:text="시간"
                 android:textAlignment="center"
-                android:textSize="24sp" />
+                android:textSize="14sp" />
 
         </LinearLayout>
 

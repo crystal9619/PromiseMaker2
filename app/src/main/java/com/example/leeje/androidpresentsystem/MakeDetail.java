@@ -423,7 +423,7 @@ public class MakeDetail extends AppCompatActivity
             Log.d( TAG, "setCurrentLocation :  mGoogleMap moveCamera "
                     + location.getLatitude() + " " + location.getLongitude() ) ;
             // CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(currentLatLng, 15);
-            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLng(currentLatLng);
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(currentLatLng,18);
             mGoogleMap.moveCamera(cameraUpdate);
         }
     }
@@ -626,7 +626,6 @@ public class MakeDetail extends AppCompatActivity
         departure=latLng;
         databaseReference.child("start").child("lat").setValue(departure.latitude);
         databaseReference.child("start").child("lon").setValue(departure.longitude);
-
 
     }
 
