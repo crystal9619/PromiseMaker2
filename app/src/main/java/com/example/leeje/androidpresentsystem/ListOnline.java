@@ -89,17 +89,11 @@ public class ListOnline extends AppCompatActivity {
         //       FirebaseInstanceId.getInstance().getToken();
 
         //set toolbar and logout/join menu
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolBar);
-        toolbar.setTitle("Promise Maker");
-        setSupportActionBar(toolbar);
+
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main_menu, menu);
-        return true;
-    }
+
+
 }
 
 

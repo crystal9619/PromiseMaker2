@@ -7,20 +7,14 @@
     tools:ignore="missingPrefix"
     tools:context="com.example.leeje.androidpresentsystem.ListOnline">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolBar"
-        android:minHeight="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:titleTextColor="@android:color/white"
-        ></android.support.v7.widget.Toolbar>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/listOnline"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/toolBar"></android.support.v7.widget.RecyclerView>
+        >
+
+    </android.support.v7.widget.RecyclerView>
 
     <Button
         android:id="@+id/promiseDetail"
@@ -48,15 +42,13 @@
         android:layout_marginTop="52dp"
         android:text="그룹만들기"
         />
-ake
+
     <Button
         android:id="@+id/promiseMake"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/mainMap"
-        android:layout_below="@+id/mainMap"
-        android:layout_marginStart="23dp"
-        android:layout_marginTop="13dp"
+        android:layout_alignEnd="@+id/promiseDetail"
+        android:layout_below="@+id/listOnline"
         android:text="약속 만들기" />
 
 

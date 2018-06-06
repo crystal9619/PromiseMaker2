@@ -74,7 +74,7 @@ public class makeName extends AppCompatActivity {
                     }
                 });
                 startActivity(intent);
-
+                finish();
             }
         });
     }
