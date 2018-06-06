@@ -69,7 +69,7 @@ public class makeGroupName extends AppCompatActivity {
                 });
                 startActivity(intent);
 
-            }
+            }//
         });
     }
 }
