@@ -48,7 +48,7 @@ public class makeName extends AppCompatActivity {
             public void onClick(final View v) {
                 if (using_name.getText().toString().equals(""))
                     return;
-                Intent intent = new Intent(makeName.this , ListOnline.class);
+                Intent intent = new Intent(makeName.this , GroupList.class);
                 intent.putExtra("ID", using_name.getText().toString());
 
                 Log.e("text","지은");
@@ -64,39 +64,13 @@ public class makeName extends AppCompatActivity {
                             Log.e("text","get uid");
                             String idToken=task.getResult().getToken();
                             String uid=mUser.getUid();
-                            databaseReference.child("UID").child("uid_group").setValue(uid);
-                            databaseReference.child(uid).setValue(using_name.getText().toString());
+                            databaseReference.child("UID").child("uid_group").child(uid).child("name").setValue(using_name.getText().toString());
+                            databaseReference.child("UID").child("uid_group").child(uid).child("group").child("1").setValue(1);
                             Log.e("text","token next");
                         }
                         else{
                             Log.e("message","idToken failed");
                         }
-                    }
-                });
-                databaseReference.child("using_name").addChildEventListener(new ChildEventListener() {
-                    @Override
-                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                        Log.e("LOG", "dataSnapshot.getKey() : " + dataSnapshot.getKey());
-                    }
-
-                    @Override
-                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-                    }
-
-                    @Override
-                    public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-                    }
-
-                    @Override
-                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
                     }
                 });
                 startActivity(intent);
