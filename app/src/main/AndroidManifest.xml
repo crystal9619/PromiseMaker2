@@ -2,12 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.leeje.androidpresentsystem">
 
-    <uses-permission android:name="android.permission.VIBRATE"/>
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.INTERACT_ACROSS_USERS_FULL" android:protectionLevel="signature" />
+    <uses-permission
+        android:name="android.permission.INTERACT_ACROSS_USERS_FULL"
+        android:protectionLevel="signature" />
 
     <application
         android:allowBackup="true"
@@ -23,52 +25,55 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity android:name=".makedate"/>
-        <activity android:name=".makeTime"/>
-        <activity android:name=".makePosition"
-            android:windowSoftInputMode="stateAlwaysHidden"
-            />
-        <activity android:name=".MakeDetail"
-            android:windowSoftInputMode="stateAlwaysHidden"
-            />
+        <activity android:name=".makedate" />
+        <activity android:name=".makeTime" />
+        <activity
+            android:name=".makePosition"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity
+            android:name=".MakeDetail"
+            android:windowSoftInputMode="stateAlwaysHidden" />
         <activity android:name=".ListOnline" />
         <activity android:name=".makeDetail2" />
         <activity android:name=".showCheckpoint" />
         <activity android:name=".main_location" />
-        <activity android:name=".makeName"/>
-        <activity android:name=".firstgroupActivity"></activity>
-        <activity android:name=".groupActivity"></activity>
-        <activity android:name=".GroupList"></activity>
-
+        <activity android:name=".makeName" />
+        <activity android:name=".firstgroupActivity" />
+        <activity android:name=".groupActivity" />
+        <activity android:name=".GroupList" />
+        <activity android:name=".makeGroupName" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <service
-            android:name=".MyFirebaseMessagingService">
+        <service android:name=".MyFirebaseMessagingService">
             <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+        <service android:name=".MyFirebaseInstanceIDService">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
         </service>
 
-        <service
-            android:name=".MyFirebaseInstanceIDService">
-            <intent-filter>
-                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
-            </intent-filter>
-        </service>
-
-        <receiver android:name=".BroadcastD"
+        <receiver
+            android:name=".BroadcastD"
             android:enabled="true"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.example.user.testalarm.ALARM_START" />
             </intent-filter>
         </receiver>
+
         <activity
             android:name=".MapsActivity"
-            android:label="@string/title_activity_maps"></activity>
+            android:label="@string/title_activity_maps" />
+        <activity
+            android:name=".test"
+            android:label="@string/title_activity_test"
+            android:theme="@style/AppTheme"></activity>
     </application>
+
 </manifest>

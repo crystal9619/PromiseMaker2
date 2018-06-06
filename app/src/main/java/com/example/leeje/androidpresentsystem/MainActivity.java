@@ -9,6 +9,8 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -21,22 +23,29 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        FirebaseUser user= FirebaseAuth.getInstance().getCurrentUser();
+        if(user!=null)
+        {
+            Intent intent = new Intent(MainActivity.this , GroupList.class);
+            startActivity(intent);
+            finish();
+        }
+
         btnLogin = (Button) findViewById(R.id.btnSignIn);
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                startActivityForResult(
-                        AuthUI.getInstance().createSignInIntentBuilder().setAllowNewEmailAccounts(true).build(), LOGIN_PERMISSION
-                );
+            public void onClick(View view)
+            {
+                startActivityForResult(AuthUI.getInstance().createSignInIntentBuilder().setAllowNewEmailAccounts(true).build(), LOGIN_PERMISSION);
             }
         });
     }
 
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-       if(requestCode==LOGIN_PERMISSION){
-           startNewActivity(resultCode,data);
-       }
+        if(requestCode==LOGIN_PERMISSION){
+            startNewActivity(resultCode,data);
+        }
     }
 
     private void startNewActivity(int resultCode, Intent data){
