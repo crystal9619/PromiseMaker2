@@ -39,6 +39,7 @@
         <activity android:name=".makeName"/>
         <activity android:name=".firstgroupActivity"></activity>
         <activity android:name=".groupActivity"></activity>
+        <activity android:name=".GroupList"></activity>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
