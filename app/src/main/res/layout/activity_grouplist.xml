@@ -8,17 +8,6 @@ tools:context="com.example.leeje.androidpresentsystem.GroupList"
 tools:layout_editor_absoluteY="81dp"
 tools:layout_editor_absoluteX="0dp">
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fbtn2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentTop="true"
-        android:layout_margin="15sp"
-        android:backgroundTint="#9500ff"
-        android:gravity="bottom|end"
-        app:srcCompat="@android:drawable/ic_input_add" />
-
     <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -45,5 +34,15 @@ tools:layout_editor_absoluteX="0dp">
     </LinearLayout>
 </LinearLayout>
 
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fbtn2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_margin="15sp"
+        android:backgroundTint="#9500ff"
+        app:srcCompat="@android:drawable/ic_input_add" />
 
 </RelativeLayout>

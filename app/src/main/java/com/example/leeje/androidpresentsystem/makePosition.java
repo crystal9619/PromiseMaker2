@@ -2,6 +2,9 @@ package com.example.leeje.androidpresentsystem;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+
+import android.content.Context;
+
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -22,6 +25,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+
+import android.view.inputmethod.InputMethodManager;
+
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -58,6 +64,8 @@ public class makePosition extends AppCompatActivity
 
     private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     private DatabaseReference databaseReference = firebaseDatabase.getReference();
+
+    InputMethodManager imm;
 
 
     private EditText edit;
@@ -96,6 +104,9 @@ public class makePosition extends AppCompatActivity
 
         setContentView(R.layout.activity_makepromise_position);
 
+
+        imm=(InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+
         edit = (EditText) findViewById(R.id.edit);
         search = (Button) findViewById(R.id.searchButton);
         dep = (TextView) findViewById(R.id.departure);
@@ -110,9 +121,22 @@ public class makePosition extends AppCompatActivity
             }
         });
 
+
+        View.OnClickListener myClickListener = new View.OnClickListener(){
+
+            @Override
+            public void onClick(View view) {
+             imm.hideSoftInputFromWindow(edit.getWindowToken(),0);
+            }
+        };
+
+
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+
+                imm.hideSoftInputFromWindow(edit.getWindowToken(),0);
 
                 List<Address> list = null;
                 String str = edit.getText().toString();
