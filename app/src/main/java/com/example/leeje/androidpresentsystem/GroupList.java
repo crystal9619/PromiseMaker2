@@ -3,6 +3,8 @@ package com.example.leeje.androidpresentsystem;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -26,7 +28,7 @@ import com.google.firebase.database.ValueEventListener;
 public class GroupList extends AppCompatActivity {
 
     private ListView group_list1;
-    private Button groupMake;
+    private FloatingActionButton groupMake;
 
     private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     private DatabaseReference databaseReference = firebaseDatabase.getReference();
@@ -35,11 +37,12 @@ public class GroupList extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_grouplist);
-        groupMake = (Button) findViewById(R.id.fbtn2);
+        groupMake = findViewById(R.id.fbtn2);
 
         groupMake.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Snackbar.make(v,"here's a snackbar",Snackbar.LENGTH_LONG).setAction("Action",null).show();
                 Intent intent = new Intent(GroupList.this , makeGroupName.class);
 
                 startActivity(intent);

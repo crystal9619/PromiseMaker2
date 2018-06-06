@@ -40,6 +40,7 @@
         <activity android:name=".firstgroupActivity"></activity>
         <activity android:name=".groupActivity"></activity>
         <activity android:name=".GroupList"></activity>
+        <activity android:name=".makeGroupName"></activity>
 
 
         <meta-data
