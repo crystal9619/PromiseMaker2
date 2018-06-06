@@ -98,7 +98,8 @@ public class MakeDetail extends AppCompatActivity
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.select_departure_layout);
-        imm=(InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+
+  imm=(InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         edit=(EditText)findViewById(R.id.edit);
         search=(Button) findViewById(R.id.searchButton);
         dep=(TextView) findViewById(R.id.departure);
@@ -123,12 +124,12 @@ public class MakeDetail extends AppCompatActivity
             }
         };
 
-
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                imm.hideSoftInputFromWindow(edit.getWindowToken(),0);
+
+    imm.hideSoftInputFromWindow(edit.getWindowToken(),0);
                 List<Address> list=null;
                 String str=edit.getText().toString();
                 edit.setText("");
