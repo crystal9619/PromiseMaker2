@@ -26,6 +26,7 @@ import com.google.firebase.database.ValueEventListener;
 public class GroupList extends AppCompatActivity {
 
     private ListView group_list1;
+    private Button groupMake;
 
     private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     private DatabaseReference databaseReference = firebaseDatabase.getReference();
@@ -34,7 +35,17 @@ public class GroupList extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_grouplist);
-        Intent intent = new Intent(GroupList.this,makeGroupName.class);
+        groupMake = (Button) findViewById(R.id.fbtn2);
+
+        groupMake.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(GroupList.this , makeGroupName.class);
+
+                startActivity(intent);
+            }
+        });
+
         Log.e("text","list map");
         group_list1 = (ListView) findViewById(R.id.group_list);
 
