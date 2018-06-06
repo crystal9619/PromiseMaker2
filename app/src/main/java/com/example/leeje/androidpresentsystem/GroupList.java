@@ -62,7 +62,7 @@ public class GroupList extends AppCompatActivity implements NavigationView.OnNav
         TextView semail=(TextView)nav_header_view.findViewById(R.id.email);
         sid.setText(name);
         semail.setText(email);
-
+//?
 
         groupMake = findViewById(R.id.fbtn2);
 
