@@ -78,7 +78,7 @@ public class GroupList extends AppCompatActivity  {
         groupMake.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Snackbar.make(v,"그룹이 생성되었습니다.",Snackbar.LENGTH_LONG).setAction("Action",null).show();
+                Snackbar.make(v,"약속이 생성되었습니다.",Snackbar.LENGTH_LONG).setAction("Action",null).show();
                 Intent intent = new Intent(GroupList.this , makeGroupName.class);
 
                 startActivity(intent);
