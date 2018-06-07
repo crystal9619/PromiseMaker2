@@ -11,8 +11,10 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -31,10 +33,16 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-public class GroupList extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+import java.util.ArrayList;
+import java.util.List;
+
+
+//public class GroupList extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class GroupList extends AppCompatActivity  {
 
     private ListView group_list1;
     private FloatingActionButton groupMake;
+    private Button enter_btn;
 
     private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     private DatabaseReference databaseReference = firebaseDatabase.getReference();
@@ -44,6 +52,8 @@ public class GroupList extends AppCompatActivity implements NavigationView.OnNav
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_grouplist);
 
+        final String[] selected_group = {"null"};
+/*
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer,R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -62,10 +72,9 @@ public class GroupList extends AppCompatActivity implements NavigationView.OnNav
         TextView semail=(TextView)nav_header_view.findViewById(R.id.email);
         sid.setText(name);
         semail.setText(email);
-//?
 
+*/
         groupMake = findViewById(R.id.fbtn2);
-
         groupMake.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -77,13 +86,30 @@ public class GroupList extends AppCompatActivity implements NavigationView.OnNav
         });
 
         Log.e("text","list map");
+
         group_list1 = (ListView) findViewById(R.id.group_list);
 
-           final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1);
+        final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1);
             group_list1.setAdapter(adapter);
-            final FirebaseUser mUser= FirebaseAuth.getInstance().getCurrentUser();
-                    Log.e("text","get uid");
-                    String uid=mUser.getUid();
+
+
+        Log.e("text","before list click");
+        group_list1.setOnItemClickListener( new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Log.e("text","after list click");
+                String groupname = (String) parent.getItemAtPosition(position);
+                Intent intent = new Intent(GroupList.this, main_location.class);
+                if(groupname!="null") {
+                intent.putExtra("groupName", groupname);
+                startActivity(intent);
+                }
+            }
+        });
+
+        final FirebaseUser mUser= FirebaseAuth.getInstance().getCurrentUser();
+        Log.e("text","get uid");
+        String uid=mUser.getUid();
         databaseReference.child("UID").child("uid_group").child(uid).child("group").addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -112,8 +138,8 @@ public class GroupList extends AppCompatActivity implements NavigationView.OnNav
             }
 
         });
-    }
 
+/*
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
@@ -143,7 +169,8 @@ public class GroupList extends AppCompatActivity implements NavigationView.OnNav
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
-    }
+    }*/
+}
 }
 
 
