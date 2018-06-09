@@ -8,64 +8,75 @@ tools:context="com.example.leeje.androidpresentsystem.GroupList"
 tools:layout_editor_absoluteY="81dp"
 tools:layout_editor_absoluteX="0dp">
 
-    <LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+
 
     <LinearLayout
-        android:layout_weight="2"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <TextView
+        <LinearLayout
+            android:layout_weight="2"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="20dp"                android:text="현재 개설된 그룹"
-            android:layout_marginBottom="20dp"
-            android:gravity="center"/>
-        <ListView
-            android:id="@+id/group_list"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-        </ListView>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20dp"
+                android:text="현재 개설된 약속"
+                android:layout_marginBottom="20dp"
+                android:gravity="center"/>
+            <ListView
+                android:id="@+id/group_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+            </ListView>
+
+        </LinearLayout>
     </LinearLayout>
-</LinearLayout>
-
-
-    <android.support.design.widget.FloatingActionButton
+ <android.support.design.widget.FloatingActionButton
         android:id="@+id/fbtn2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:layout_margin="15sp"
+        android:layout_marginBottom="70sp"
+        android:layout_marginRight="15sp"
         android:backgroundTint="#9500ff"
         app:srcCompat="@android:drawable/ic_input_add" />
 
+    <!--
+        <Button
+            android:id="@+id/enter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="15sp"
+            android:gravity="center"
+            android:text="약속들어가기" />
 
-    <android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/drawer_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fitsSystemWindows="true"
-        tools:openDrawer="start">
+        <android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:id="@+id/drawer_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fitsSystemWindows="true"
+                tools:openDrawer="start">
 
+                 <android.support.design.widget.NavigationView
+                     android:id="@+id/nav_view"
+                     android:layout_width="wrap_content"
+                     android:layout_height="match_parent"
+                     android:layout_gravity="start"
+                     android:fitsSystemWindows="true"
+                     app:headerLayout="@layout/nav_header_test"
+                     app:menu="@menu/test_drawer" />
 
-        <android.support.design.widget.NavigationView
-            android:id="@+id/nav_view"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="start"
-            android:fitsSystemWindows="true"
-            app:headerLayout="@layout/nav_header_test"
-            app:menu="@menu/test_drawer" />
+        </android.support.v4.widget.DrawerLayout>
 
-    </android.support.v4.widget.DrawerLayout>
-
-
+    -->
 </RelativeLayout>

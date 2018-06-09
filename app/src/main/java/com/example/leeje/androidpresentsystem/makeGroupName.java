@@ -43,7 +43,7 @@ public class makeGroupName extends AppCompatActivity {
             public void onClick(final View v) {
                 if (using_name.getText().toString().equals(""))
                     return;
-                Intent intent = new Intent(makeGroupName.this , ListOnline.class);
+                Intent intent = new Intent(makeGroupName.this , showJoinNameList.class);
                 intent.putExtra("ID", using_name.getText().toString());
 
                 Log.e("text","지은");
@@ -60,6 +60,7 @@ public class makeGroupName extends AppCompatActivity {
                             String idToken=task.getResult().getToken();
                             String uid=mUser.getUid();
                             databaseReference.child("UID").child("uid_group").child(uid).child("group").child(using_name.getText().toString()).setValue(0);
+                            //databaseReference.child("group").child(using_name.getText().toString());
                             Log.e("text","token next");
                         }
                         else{
