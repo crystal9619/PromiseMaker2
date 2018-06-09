@@ -134,8 +134,9 @@ public class main_location extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(main_location.this, showCheckpoint2.class);
-                finish();
                 startActivity(intent);
+                finish();
+
             }
         });
         img1 = (ImageView) findViewById(R.id.image1);
@@ -288,14 +289,14 @@ public class main_location extends AppCompatActivity
         });
 
 
-        databaseReference.child("류경민").child("moving").addValueEventListener(new ValueEventListener() {
+        databaseReference.child("박수정").child("moving").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Double lat = dataSnapshot.child("moving_site_lat").getValue(Double.class);
                 Double lon = dataSnapshot.child("moving_site_lon").getValue(Double.class);
                 if (marker1 != null) marker1.remove();
                 marker1 = mGoogleMap.addMarker(new MarkerOptions().position(new LatLng(lat, lon)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
-                name1.setText("류경민");
+                name1.setText("박수정");
                 adr1.setText(getCurrentAddress(new LatLng(lat, lon)));
                 Log.e("??", "데이터 넣는중...");
             }
@@ -307,14 +308,14 @@ public class main_location extends AppCompatActivity
         });
 
 
-        databaseReference.child("박수정").child("moving").addValueEventListener(new ValueEventListener() {
+        databaseReference.child("이지은").child("moving").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Double lat = dataSnapshot.child("moving_site_lat").getValue(Double.class);
                 Double lon = dataSnapshot.child("moving_site_lon").getValue(Double.class);
                 if (marker2 != null) marker2.remove();
                 marker2 = mGoogleMap.addMarker(new MarkerOptions().position(new LatLng(lat, lon)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)));
-                name2.setText("박수정");
+                name2.setText("이지은");
                 adr2.setText(getCurrentAddress(new LatLng(lat, lon)));
                 Log.e("??", "데이터 넣는중...");
             }
@@ -385,8 +386,8 @@ public class main_location extends AppCompatActivity
     @Override
     public void onLocationChanged(Location location) {
 
-        databaseReference.child("이지은").child("moving").child("moving_site_lat").setValue(location.getLatitude());
-        databaseReference.child("이지은").child("moving").child("moving_site_lon").setValue(location.getLongitude());
+        databaseReference.child("류경민").child("moving").child("moving_site_lat").setValue(location.getLatitude());
+        databaseReference.child("류경민").child("moving").child("moving_site_lon").setValue(location.getLongitude());
 
         currentPosition
                 = new LatLng(location.getLatitude(), location.getLongitude());
@@ -871,7 +872,7 @@ public class main_location extends AppCompatActivity
 
     private void slow()
     {
-        databaseReference.child("류경민").addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseReference.child("박수정").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -950,7 +951,7 @@ public class main_location extends AppCompatActivity
             }
         });
 
-        databaseReference.child("박수정").addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseReference.child("이지은").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Double startlat = dataSnapshot.child("start").child("lat").getValue(Double.class);

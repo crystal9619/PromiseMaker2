@@ -175,16 +175,16 @@ public class showCheckpoint extends AppCompatActivity implements OnMapReadyCallb
         databaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                startlat=dataSnapshot.child("이지은").child("start").child("lat").getValue(Double.class);
-                startlon=dataSnapshot.child("이지은").child("start").child("lon").getValue(Double.class);
+                startlat=dataSnapshot.child("류경민").child("start").child("lat").getValue(Double.class);
+                startlon=dataSnapshot.child("류경민").child("start").child("lon").getValue(Double.class);
                 ar_time=dataSnapshot.child("end").child("time").getValue(Long.class);
                 endlat=dataSnapshot.child("end").child("lat").getValue(Double.class);
                 endlon=dataSnapshot.child("end").child("lon").getValue(Double.class);
 
-                ck1lat=  dataSnapshot.child("이지은").child("ck1").child("lat").getValue(Double.class);
-                ck1lon =  dataSnapshot.child("이지은").child("ck1").child("lon").getValue(Double.class);
-                ck2lat =  dataSnapshot.child("이지은").child("ck2").child("lat").getValue(Double.class);
-                ck2lon =  dataSnapshot.child("이지은").child("ck2").child("lon").getValue(Double.class);
+                ck1lat=  dataSnapshot.child("류경민").child("ck1").child("lat").getValue(Double.class);
+                ck1lon =  dataSnapshot.child("류경민").child("ck1").child("lon").getValue(Double.class);
+                ck2lat =  dataSnapshot.child("류경민").child("ck2").child("lat").getValue(Double.class);
+                ck2lon =  dataSnapshot.child("류경민").child("ck2").child("lon").getValue(Double.class);
 
                 mapOperation(googleMap);
             }
@@ -262,7 +262,7 @@ public class showCheckpoint extends AppCompatActivity implements OnMapReadyCallb
             SimpleDateFormat hour = new SimpleDateFormat("hh");
             SimpleDateFormat minute = new SimpleDateFormat("mm");
             String formattedDate = hour.format(date)+"시 "+minute.format(date)+"분";
-            databaseRef.child("이지은").child("ck2").child("도착시간").setValue(unixSeconds);
+            databaseRef.child("류경민").child("ck2").child("도착시간").setValue(unixSeconds);
             time3.setText(formattedDate);
 
         }
@@ -276,7 +276,7 @@ public class showCheckpoint extends AppCompatActivity implements OnMapReadyCallb
             SimpleDateFormat hour = new SimpleDateFormat("hh");
             SimpleDateFormat minute = new SimpleDateFormat("mm");
             String formattedDate = hour.format(date)+"시 "+minute.format(date)+"분";
-            databaseRef.child("이지은").child("ck2").child("도착시간").setValue(unixSeconds);
+            databaseRef.child("류경민").child("ck2").child("도착시간").setValue(unixSeconds);
             time3.setText(formattedDate);
 
         }
@@ -302,7 +302,7 @@ public class showCheckpoint extends AppCompatActivity implements OnMapReadyCallb
             SimpleDateFormat hour = new SimpleDateFormat("hh");
             SimpleDateFormat minute = new SimpleDateFormat("mm");
             String formattedDate = hour.format(date)+"시 "+minute.format(date)+"분";
-            databaseRef.child("이지은").child("ck1").child("도착시간").setValue(unixSeconds);
+            databaseRef.child("류경민").child("ck1").child("도착시간").setValue(unixSeconds);
             time2.setText(formattedDate);
 
         }
@@ -315,7 +315,7 @@ public class showCheckpoint extends AppCompatActivity implements OnMapReadyCallb
             SimpleDateFormat hour = new SimpleDateFormat("hh");
             SimpleDateFormat minute = new SimpleDateFormat("mm");
             String formattedDate = hour.format(date)+"시 "+minute.format(date)+"분";
-            databaseRef.child("이지은").child("ck1").child("도착시간").setValue(unixSeconds);
+            databaseRef.child("류경민").child("ck1").child("도착시간").setValue(unixSeconds);
             time2.setText(formattedDate);
 
         }
@@ -344,7 +344,7 @@ public class showCheckpoint extends AppCompatActivity implements OnMapReadyCallb
             SimpleDateFormat hour = new SimpleDateFormat("hh");
             SimpleDateFormat minute = new SimpleDateFormat("mm");
             String formattedDate = hour.format(date)+"시 "+minute.format(date)+"분";
-            databaseRef.child("이지은").child("start").child("출발시간").setValue(unixSeconds);
+            databaseRef.child("류경민").child("start").child("출발시간").setValue(unixSeconds);
             time1.setText(formattedDate);
 
         }
@@ -357,7 +357,7 @@ public class showCheckpoint extends AppCompatActivity implements OnMapReadyCallb
             SimpleDateFormat hour = new SimpleDateFormat("hh");
             SimpleDateFormat minute = new SimpleDateFormat("mm");
             String formattedDate = hour.format(date)+"시 "+minute.format(date)+"분";
-            databaseRef.child("이지은").child("start").child("출발시간").setValue(unixSeconds);
+            databaseRef.child("류경민").child("start").child("출발시간").setValue(unixSeconds);
             time1.setText(formattedDate);
 
         }
