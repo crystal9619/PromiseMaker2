@@ -37,7 +37,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-//public class GroupList extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 public class GroupList extends AppCompatActivity  {
 
     private ListView group_list1;
@@ -53,27 +52,6 @@ public class GroupList extends AppCompatActivity  {
         setContentView(R.layout.activity_grouplist);
 
         final String[] selected_group = {"null"};
-/*
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer,R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        String email=user.getEmail();
-        String name=user.getDisplayName();
-        View nav_header_view = navigationView.getHeaderView(0);
-        TextView sid=(TextView)nav_header_view.findViewById(R.id.id);
-        TextView semail=(TextView)nav_header_view.findViewById(R.id.email);
-        sid.setText(name);
-        semail.setText(email);
-
-*/
         groupMake = findViewById(R.id.fbtn2);
         groupMake.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -139,38 +117,7 @@ public class GroupList extends AppCompatActivity  {
 
         });
 
-/*
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
     }
-
-
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.logout) {
-            FirebaseAuth.getInstance().signOut();
-            Intent intent = new Intent(this, MainActivity.class);
-            finish();
-            startActivity(intent);
-
-            // Handle the camera action
-        } else if (id == R.id.manage) {
-
-        }
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }*/
-}
 }
 
 

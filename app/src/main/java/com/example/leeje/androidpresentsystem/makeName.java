@@ -65,7 +65,7 @@ public class makeName extends AppCompatActivity {
                             String idToken=task.getResult().getToken();
                             String uid=mUser.getUid();
                             databaseReference.child("UID").child("uid_group").child(uid).child("name").setValue(using_name.getText().toString());
-                            databaseReference.child("UID").child("uid_group").child(uid).child("group").child("1").setValue(1);
+                           // databaseReference.child("UID").child("uid_group").child(uid).child("group").child("1").setValue(1);
                             Log.e("text","token next");
                         }
                         else{
