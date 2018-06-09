@@ -38,96 +38,52 @@ import java.util.List;
 
 
 //public class GroupList extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-public class GroupList extends AppCompatActivity  {
+public class friendlist extends AppCompatActivity  {
 
     private ListView group_list1;
     private FloatingActionButton groupMake;
     private Button enter_btn;
 
-    int flag=0;
     private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     private DatabaseReference databaseReference = firebaseDatabase.getReference();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_grouplist);
+        setContentView(R.layout.friendlist);
 
         final String[] selected_group = {"null"};
-/*
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer,R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        String email=user.getEmail();
-        String name=user.getDisplayName();
-        View nav_header_view = navigationView.getHeaderView(0);
-        TextView sid=(TextView)nav_header_view.findViewById(R.id.id);
-        TextView semail=(TextView)nav_header_view.findViewById(R.id.email);
-        sid.setText(name);
-        semail.setText(email);
-
-*/
-        groupMake = findViewById(R.id.fbtn2);
-        groupMake.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Snackbar.make(v,"약속이 생성되었습니다.",Snackbar.LENGTH_LONG).setAction("Action",null).show();
-                Intent intent = new Intent(GroupList.this , makeGroupName.class);
-
-                startActivity(intent);
-                flag=0;
-            }
-        });
 
         Log.e("text","list map");
 
         group_list1 = (ListView) findViewById(R.id.group_list);
 
         final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1);
-            group_list1.setAdapter(adapter);
+        group_list1.setAdapter(adapter);
 
-
-        Log.e("text","before list click");
-        group_list1.setOnItemClickListener( new AdapterView.OnItemClickListener() {
+        Button bt = (Button)findViewById(R.id.button2);
+        bt.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.e("text","after list click");
-                String groupname = (String) parent.getItemAtPosition(position);
-                if(flag==1)
-                {
-                    Intent intent = new Intent(GroupList.this, main_location.class);
-                    startActivity(intent);
-                }
-
-                else
-                {
-                    Intent intent = new Intent(GroupList.this,MakeDetail.class);
-                    startActivity(intent);
-                    flag=1;
-                }
-                if(groupname!="null") {
-            //    intent.putExtra("groupName", groupname);
-
-                }
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), makedate.class);
+                startActivity(intent);
             }
         });
+
 
         final FirebaseUser mUser= FirebaseAuth.getInstance().getCurrentUser();
         Log.e("text","get uid");
         String uid=mUser.getUid();
-        databaseReference.child("UID").child("uid_group").child(uid).child("group").addChildEventListener(new ChildEventListener() {
+        databaseReference.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Log.e("LOG", "dataSnapshot.getKey() : " + dataSnapshot.getKey());
-                adapter.add(dataSnapshot.getKey());
+                Log.e("LOG", "dataSnapshot.getKey() : " + dataSnapshot.child("UID").child("uid_group").getKey());
+
+                String uid = (dataSnapshot.child("UID").child("uid_group").getKey());
+                String name=dataSnapshot.child(uid).getValue(String.class);
+
+                adapter.add("name");
+
             }
 
             @Override
@@ -183,7 +139,7 @@ public class GroupList extends AppCompatActivity  {
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }*/
-}
+    }
 }
 
 

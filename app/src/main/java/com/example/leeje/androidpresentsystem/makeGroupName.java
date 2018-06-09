@@ -43,7 +43,7 @@ public class makeGroupName extends AppCompatActivity {
             public void onClick(final View v) {
                 if (using_name.getText().toString().equals(""))
                     return;
-                Intent intent = new Intent(makeGroupName.this , makedate.class);
+                Intent intent = new Intent(makeGroupName.this ,makedate.class);
                 intent.putExtra("ID", using_name.getText().toString());
 
                 Log.e("text","지은");
