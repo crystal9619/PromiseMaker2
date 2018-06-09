@@ -74,10 +74,16 @@ public class showJoinNameList extends AppCompatActivity {
                 finish();
             }
         });
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        String name = user.getDisplayName();
         final FirebaseUser mUser= FirebaseAuth.getInstance().getCurrentUser();
         Log.e("text","get uid");
         String uid=mUser.getUid();
-        databaseReference.child("UID").child("uid_group").addChildEventListener(new ChildEventListener() {
+
+        databaseReference.child("group").child("uid_group").child("이지은").setValue(0);
+        databaseReference.child("group").child("uid_group").child("박수정").setValue(0);
+        databaseReference.child("group").child("uid_group").child("류경민").setValue(0);
+        databaseReference.child("group").child("uid_group").addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 Log.e("LOG", "dataSnapshot.getKey() : " + dataSnapshot.getKey());

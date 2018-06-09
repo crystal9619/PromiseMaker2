@@ -81,7 +81,7 @@ public class GroupList extends AppCompatActivity  {
                 String groupname = (String) parent.getItemAtPosition(position);
                 if(flag==1)
                 {
-                    Intent intent = new Intent(GroupList.this, main_location.class);
+                    Intent intent = new Intent(GroupList.this, showJoinNameList.class);
                     startActivity(intent);
                 }
 
@@ -100,6 +100,7 @@ public class GroupList extends AppCompatActivity  {
 
         final FirebaseUser mUser= FirebaseAuth.getInstance().getCurrentUser();
         Log.e("text","get uid");
+
         String uid=mUser.getUid();
         databaseReference.child("UID").child("uid_group").child(uid).child("group").addChildEventListener(new ChildEventListener() {
             @Override
