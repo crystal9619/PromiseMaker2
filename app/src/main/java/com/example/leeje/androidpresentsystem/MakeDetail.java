@@ -674,8 +674,8 @@ public class MakeDetail extends AppCompatActivity
         mGoogleMap.addMarker(new MarkerOptions().position(latLng).title("출발지").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
         dep.setText(getCurrentAddress(latLng));
         departure=latLng;
-        databaseReference.child("start").child("lat").setValue(departure.latitude);
-        databaseReference.child("start").child("lon").setValue(departure.longitude);
+        databaseReference.child("이지은").child("start").child("lat").setValue(departure.latitude);
+        databaseReference.child("이지은").child("start").child("lon").setValue(departure.longitude);
 
     }
 

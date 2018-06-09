@@ -1,27 +1,34 @@
 package com.example.leeje.androidpresentsystem;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
+import android.media.Image;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,15 +46,29 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ExecutionException;
 
 
 public class main_location extends AppCompatActivity
@@ -60,16 +81,28 @@ public class main_location extends AppCompatActivity
     private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     private DatabaseReference databaseReference = firebaseDatabase.getReference();
 
+    private long ck1lat;
+    private long ck1lon;
+    private Marker ck1marker = null;
+    private Marker ck2marker = null;
+    private Marker ck1marker2 = null;
+    private Marker ck2marker2 = null;
+
+    private Polyline line1;
+    private Polyline line2;
+    private Double endlat;
+    private Double endlon;
     private TextView name1;
     private TextView name2;
     private TextView adr1;
     private TextView adr2;
-
+    private ImageView img1;
+    private ImageView img2;
     private GoogleApiClient mGoogleApiClient = null;
     private GoogleMap mGoogleMap = null;
     private Marker currentMarker = null;
-    private Marker marker1=null;
-    private Marker marker2=null;
+    private Marker marker1 = null;
+    private Marker marker2 = null;
     private static final String TAG = "googlemap_example";
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 2002;
@@ -83,7 +116,7 @@ public class main_location extends AppCompatActivity
     boolean mMoveMapByUser = true;
     boolean mMoveMapByAPI = true;
     LatLng currentPosition;
-
+    float pressedX;
     LatLng departure;
 
     LocationRequest locationRequest = new LocationRequest()
@@ -95,19 +128,65 @@ public class main_location extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.main_location_layout);
+        Button next = (Button) findViewById(R.id.next);
+        next.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(main_location.this, showCheckpoint2.class);
+                finish();
+                startActivity(intent);
+            }
+        });
+        img1 = (ImageView) findViewById(R.id.image1);
+        img1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if (ck1marker.isVisible() == true) {
+                    ck1marker.setVisible(false);
+                    ck2marker.setVisible(false);
+                    line1.setVisible(false);
+
+                } else {
+                    CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(marker1.getPosition(), 13);
+                    mGoogleMap.moveCamera(cameraUpdate);
+                    ck1marker.setVisible(true);
+                    ck2marker.setVisible(true);
+                    line1.setVisible(true);
+                }
+            }
+        });
+        img2 = (ImageView) findViewById(R.id.image2);
+        img2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if (ck1marker2.isVisible() == true) {
+                    ck1marker2.setVisible(false);
+                    ck2marker2.setVisible(false);
+                    line2.setVisible(false);
+
+                } else {
+                    CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(marker2.getPosition(), 13);
+                    mGoogleMap.moveCamera(cameraUpdate);
+                    ck1marker2.setVisible(true);
+                    ck2marker2.setVisible(true);
+                    line2.setVisible(true);
+                }
+            }
+        });
+        ConstraintLayout layout = (ConstraintLayout) findViewById(R.id.layout);
 
 
-        name1=(TextView) findViewById(R.id.name1);
-        name2=(TextView) findViewById(R.id.name2);
-        adr1=(TextView) findViewById(R.id.adr1);
-        adr2=(TextView) findViewById(R.id.adr2);
+        name1 = (TextView) findViewById(R.id.name1);
+        name2 = (TextView) findViewById(R.id.name2);
+        adr1 = (TextView) findViewById(R.id.adr1);
+        adr2 = (TextView) findViewById(R.id.adr2);
 
 
         Log.d(TAG, "onCreate");
         mActivity = this;
-
 
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -152,7 +231,7 @@ public class main_location extends AppCompatActivity
 
             Log.d(TAG, "startLocationUpdates : call showDialogForLocationServiceSetting");
             showDialogForLocationServiceSetting();
-        }else {
+        } else {
 
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                     && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -173,14 +252,12 @@ public class main_location extends AppCompatActivity
     }
 
 
-
     private void stopLocationUpdates() {
 
-        Log.d(TAG,"stopLocationUpdates : LocationServices.FusedLocationApi.removeLocationUpdates");
+        Log.d(TAG, "stopLocationUpdates : LocationServices.FusedLocationApi.removeLocationUpdates");
         LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
         mRequestingLocationUpdates = false;
     }
-
 
 
     @Override
@@ -190,14 +267,15 @@ public class main_location extends AppCompatActivity
 
         mGoogleMap = googleMap;
 
-        databaseReference.child("end").addListenerForSingleValueEvent(new ValueEventListener(){
+        databaseReference.child("end").addListenerForSingleValueEvent(new ValueEventListener() {
 
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Double endlat=dataSnapshot.child("lat").getValue(Double.class);
-                Double endlon=dataSnapshot.child("lon").getValue(Double.class);
+                endlat = dataSnapshot.child("lat").getValue(Double.class);
+                endlon = dataSnapshot.child("lon").getValue(Double.class);
+                slow();
                 MarkerOptions end = new MarkerOptions();
-                end.position(new LatLng(endlat,endlon)).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_map_arrive));
+                end.position(new LatLng(endlat, endlon)).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_map_arrive));
                 mGoogleMap.addMarker(end).showInfoWindow();
             }
 
@@ -209,40 +287,41 @@ public class main_location extends AppCompatActivity
 
         });
 
+
         databaseReference.child("류경민").child("moving").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Double lat=dataSnapshot.child("moving_site_lat").getValue(Double.class);
-                Double lon=dataSnapshot.child("moving_site_lon").getValue(Double.class);
-                if(marker1!=null) marker1.remove();
-               marker1=mGoogleMap.addMarker(new MarkerOptions().position(new LatLng(lat,lon)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+                Double lat = dataSnapshot.child("moving_site_lat").getValue(Double.class);
+                Double lon = dataSnapshot.child("moving_site_lon").getValue(Double.class);
+                if (marker1 != null) marker1.remove();
+                marker1 = mGoogleMap.addMarker(new MarkerOptions().position(new LatLng(lat, lon)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
                 name1.setText("류경민");
-                adr1.setText(getCurrentAddress(new LatLng(lat,lon)));
-                Log.e("??","데이터 넣는중...");
+                adr1.setText(getCurrentAddress(new LatLng(lat, lon)));
+                Log.e("??", "데이터 넣는중...");
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Log.e("???","에러발생");
+                Log.e("???", "에러발생");
             }
         });
 
 
-        databaseReference.child("이지은").child("moving").addValueEventListener(new ValueEventListener() {
+        databaseReference.child("박수정").child("moving").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Double lat=dataSnapshot.child("moving_site_lat").getValue(Double.class);
-                Double lon=dataSnapshot.child("moving_site_lon").getValue(Double.class);
-                if(marker2!=null) marker2.remove();
-                marker2=mGoogleMap.addMarker(new MarkerOptions().position(new LatLng(lat,lon)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)));
-                name2.setText("이지은");
-                adr2.setText(getCurrentAddress(new LatLng(lat,lon)));
-                Log.e("??","데이터 넣는중...");
+                Double lat = dataSnapshot.child("moving_site_lat").getValue(Double.class);
+                Double lon = dataSnapshot.child("moving_site_lon").getValue(Double.class);
+                if (marker2 != null) marker2.remove();
+                marker2 = mGoogleMap.addMarker(new MarkerOptions().position(new LatLng(lat, lon)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)));
+                name2.setText("박수정");
+                adr2.setText(getCurrentAddress(new LatLng(lat, lon)));
+                Log.e("??", "데이터 넣는중...");
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Log.e("???","에러발생");
+                Log.e("???", "에러발생");
             }
         });
 
@@ -255,13 +334,13 @@ public class main_location extends AppCompatActivity
 
         //mGoogleMap.getUiSettings().setZoomControlsEnabled(false);
         mGoogleMap.getUiSettings().setMyLocationButtonEnabled(true);
-        mGoogleMap.animateCamera(CameraUpdateFactory.zoomTo(15));
-        mGoogleMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener(){
+        mGoogleMap.animateCamera(CameraUpdateFactory.zoomTo(13));
+        mGoogleMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
 
             @Override
             public boolean onMyLocationButtonClick() {
 
-                Log.d( TAG, "onMyLocationButtonClick : 위치에 따른 카메라 이동 활성화");
+                Log.d(TAG, "onMyLocationButtonClick : 위치에 따른 카메라 이동 활성화");
                 mMoveMapByAPI = true;
                 return true;
             }
@@ -271,7 +350,7 @@ public class main_location extends AppCompatActivity
             @Override
             public void onMapClick(LatLng latLng) {
 
-                Log.d( TAG, "onMapClick :");
+                Log.d(TAG, "onMapClick :");
             }
         });
 
@@ -280,7 +359,7 @@ public class main_location extends AppCompatActivity
             @Override
             public void onCameraMoveStarted(int i) {
 
-                if (mMoveMapByUser == true && mRequestingLocationUpdates){
+                if (mMoveMapByUser == true && mRequestingLocationUpdates) {
 
                     Log.d(TAG, "onCameraMove : 위치에 따른 카메라 이동 비활성화");
                     mMoveMapByAPI = false;
@@ -306,11 +385,11 @@ public class main_location extends AppCompatActivity
     @Override
     public void onLocationChanged(Location location) {
 
-        databaseReference.child("박수정").child("moving").child("moving_site_lat").setValue(location.getLatitude());
-        databaseReference.child("박수정").child("moving").child("moving_site_lon").setValue(location.getLongitude());
+        databaseReference.child("이지은").child("moving").child("moving_site_lat").setValue(location.getLatitude());
+        databaseReference.child("이지은").child("moving").child("moving_site_lon").setValue(location.getLongitude());
 
         currentPosition
-                = new LatLng( location.getLatitude(), location.getLongitude());
+                = new LatLng(location.getLatitude(), location.getLongitude());
 
 
         Log.d(TAG, "onLocationChanged : ");
@@ -329,7 +408,7 @@ public class main_location extends AppCompatActivity
     @Override
     protected void onStart() {
 
-        if(mGoogleApiClient != null && mGoogleApiClient.isConnected() == false){
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected() == false) {
 
             Log.d(TAG, "onStart: mGoogleApiClient connect");
             mGoogleApiClient.connect();
@@ -347,7 +426,7 @@ public class main_location extends AppCompatActivity
             stopLocationUpdates();
         }
 
-        if ( mGoogleApiClient.isConnected()) {
+        if (mGoogleApiClient.isConnected()) {
 
             Log.d(TAG, "onStop : mGoogleApiClient disconnect");
             mGoogleApiClient.disconnect();
@@ -361,7 +440,7 @@ public class main_location extends AppCompatActivity
     public void onConnected(Bundle connectionHint) {
 
 
-        if ( mRequestingLocationUpdates == false ) {
+        if (mRequestingLocationUpdates == false) {
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
@@ -382,7 +461,7 @@ public class main_location extends AppCompatActivity
                     mGoogleMap.setMyLocationEnabled(true);
                 }
 
-            }else{
+            } else {
 
                 Log.d(TAG, "onConnected : call startLocationUpdates");
                 startLocationUpdates();
@@ -480,12 +559,12 @@ public class main_location extends AppCompatActivity
 //        currentMarker = mGoogleMap.addMarker(markerOptions);
 
 
-        if ( mMoveMapByAPI ) {
+        if (mMoveMapByAPI) {
 
-            Log.d( TAG, "setCurrentLocation :  mGoogleMap moveCamera "
-                    + location.getLatitude() + " " + location.getLongitude() ) ;
+            Log.d(TAG, "setCurrentLocation :  mGoogleMap moveCamera "
+                    + location.getLatitude() + " " + location.getLongitude());
             // CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(currentLatLng, 15);
-            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(currentLatLng,18);
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(currentLatLng, 13);
             mGoogleMap.moveCamera(cameraUpdate);
         }
     }
@@ -512,7 +591,7 @@ public class main_location extends AppCompatActivity
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
         currentMarker = mGoogleMap.addMarker(markerOptions);
 
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(DEFAULT_LOCATION, 15);
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(DEFAULT_LOCATION, 13);
         mGoogleMap.moveCamera(cameraUpdate);
 
     }
@@ -540,7 +619,7 @@ public class main_location extends AppCompatActivity
 
             Log.d(TAG, "checkPermissions : 퍼미션 가지고 있음");
 
-            if ( mGoogleApiClient.isConnected() == false) {
+            if (mGoogleApiClient.isConnected() == false) {
 
                 Log.d(TAG, "checkPermissions : 퍼미션 가지고 있음");
                 mGoogleApiClient.connect();
@@ -561,12 +640,11 @@ public class main_location extends AppCompatActivity
             if (permissionAccepted) {
 
 
-                if ( mGoogleApiClient.isConnected() == false) {
+                if (mGoogleApiClient.isConnected() == false) {
 
                     Log.d(TAG, "onRequestPermissionsResult : mGoogleApiClient connect");
                     mGoogleApiClient.connect();
                 }
-
 
 
             } else {
@@ -668,9 +746,9 @@ public class main_location extends AppCompatActivity
                         Log.d(TAG, "onActivityResult : 퍼미션 가지고 있음");
 
 
-                        if ( mGoogleApiClient.isConnected() == false ) {
+                        if (mGoogleApiClient.isConnected() == false) {
 
-                            Log.d( TAG, "onActivityResult : mGoogleApiClient connect ");
+                            Log.d(TAG, "onActivityResult : mGoogleApiClient connect ");
                             mGoogleApiClient.connect();
                         }
                         return;
@@ -690,4 +768,264 @@ public class main_location extends AppCompatActivity
     public void onMapClick(LatLng latLng) {
 
     }
+
+    private class DownloadTask extends AsyncTask<String, Void, String> {
+
+        // Downloading data in non-ui thread
+        @Override
+        protected String doInBackground(String... url) {
+
+            // For storing data from web service
+            String data = "";
+
+            try {
+                // Fetching the data from web service
+                data = downloadUrl(url[0]);
+            } catch (Exception e) {
+                Log.d("Background Task", e.toString());
+            }
+            return data;
+        }
+
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+        }
+
+    }
+
+    private String downloadUrl(String strUrl) throws IOException {
+        String data = "";
+        InputStream iStream = null;
+        HttpURLConnection urlConnection = null;
+        try {
+            URL url = new URL(strUrl);
+
+            // Creating an http connection to communicate with url
+            urlConnection = (HttpURLConnection) url.openConnection();
+
+            // Connecting to url
+            urlConnection.connect();
+
+            // Reading data from url
+            iStream = urlConnection.getInputStream();
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(iStream));
+
+            StringBuffer sb = new StringBuffer();
+
+            String line = "";
+            while ((line = br.readLine()) != null) {
+                sb.append(line);
+            }
+
+            data = sb.toString();
+            Log.d("Ex", data);
+            br.close();
+
+        } catch (Exception e) {
+            Log.d("Ex", e.toString());
+        } finally {
+            iStream.close();
+            urlConnection.disconnect();
+        }
+        return data;
+    }
+
+    public static List<LatLng> decode(final String encodedPath) {
+        int len = encodedPath.length();
+
+        // For speed we preallocate to an upper bound on the final length, then
+        // truncate the array before returning.
+        final List<LatLng> path = new ArrayList<LatLng>();
+        int index = 0;
+        int lat = 0;
+        int lng = 0;
+
+        while (index < len) {
+            int result = 1;
+            int shift = 0;
+            int b;
+            do {
+                b = encodedPath.charAt(index++) - 63 - 1;
+                result += b << shift;
+                shift += 5;
+            } while (b >= 0x1f);
+            lat += (result & 1) != 0 ? ~(result >> 1) : (result >> 1);
+
+            result = 1;
+            shift = 0;
+            do {
+                b = encodedPath.charAt(index++) - 63 - 1;
+                result += b << shift;
+                shift += 5;
+            } while (b >= 0x1f);
+            lng += (result & 1) != 0 ? ~(result >> 1) : (result >> 1);
+
+            path.add(new LatLng(lat * 1e-5, lng * 1e-5));
+        }
+
+        return path;
+    }
+
+
+
+    private void slow()
+    {
+        databaseReference.child("류경민").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                Double startlat = dataSnapshot.child("start").child("lat").getValue(Double.class);
+                Double startlon = dataSnapshot.child("start").child("lon").getValue(Double.class);
+                Double ck1lat = dataSnapshot.child("ck1").child("lat").getValue(Double.class);
+                Double ck1lon = dataSnapshot.child("ck1").child("lon").getValue(Double.class);
+                Double ck2lat = dataSnapshot.child("ck2").child("lat").getValue(Double.class);
+                Double ck2lon = dataSnapshot.child("ck2").child("lon").getValue(Double.class);
+                long unixSeconds = dataSnapshot.child("ck1").child("도착시간").getValue(Long.class);
+                Date date = new Date(unixSeconds * 1000L);
+
+                SimpleDateFormat hour = new SimpleDateFormat("hh");
+                SimpleDateFormat minute = new SimpleDateFormat("mm");
+                String formattedDate = hour.format(date) + "시 " + minute.format(date) + "분";
+
+                long unixSecond2s = dataSnapshot.child("ck2").child("도착시간").getValue(Long.class);
+                Date date2 = new Date(unixSeconds * 1000L);
+
+                SimpleDateFormat hour2 = new SimpleDateFormat("hh");
+                SimpleDateFormat minute2 = new SimpleDateFormat("mm");
+                String formattedDate2 = hour.format(date) + "시 " + minute.format(date) + "분";
+
+                ck1marker = mGoogleMap.addMarker(new MarkerOptions().title(formattedDate).position(new LatLng(ck1lat, ck1lon)).icon(BitmapDescriptorFactory.fromResource(R.drawable.check)));
+                ck2marker = mGoogleMap.addMarker(new MarkerOptions().title(formattedDate2).position(new LatLng(ck2lat, ck2lon)).icon(BitmapDescriptorFactory.fromResource(R.drawable.check)));
+
+
+                ck1marker.setVisible(false);
+                ck2marker.setVisible(false);
+
+
+
+
+                DownloadTask downloadTask = new DownloadTask();
+                String url = "https://maps.googleapis.com/maps/api/directions/json?origin=" + Double.toString(startlat) + "," + Double.toString(startlon) + "&destination=" + Double.toString(endlat) + "," + Double.toString(endlon) + "&mode=transit&key=AIzaSyDdDWNDyd7YM9RRTdCa10ha3PhIOPScqQA";
+                Log.d("??", url);
+                String result = "";
+                String route = "";
+                try {
+                    result = downloadTask.execute(url).get();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+
+                try {
+                    JSONObject jsonObject = null;
+                    jsonObject = new JSONObject(result);
+                    route = jsonObject.getJSONArray("routes").getJSONObject(0).getJSONObject("overview_polyline").getString("points");
+                } catch (JSONException e) {
+                    Log.d("??", "오류오류");
+                }
+
+                List<LatLng> poly;
+
+                poly = decode(route);
+
+                PolylineOptions polyoption = new PolylineOptions();
+                polyoption.geodesic(true);
+                for (int i = 0; i < poly.size(); i++) {
+                    Log.d("??", Double.toString(poly.get(i).latitude));
+                    polyoption.add(poly.get(i));
+                }
+
+                polyoption.width(10);
+                polyoption.color(Color.GREEN);
+                line1 = mGoogleMap.addPolyline(polyoption);
+
+                line1.setVisible(false);
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
+
+        databaseReference.child("박수정").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Double startlat = dataSnapshot.child("start").child("lat").getValue(Double.class);
+                Double startlon = dataSnapshot.child("start").child("lon").getValue(Double.class);
+                Double ck1lat = dataSnapshot.child("ck1").child("lat").getValue(Double.class);
+                Double ck1lon = dataSnapshot.child("ck1").child("lon").getValue(Double.class);
+                Double ck2lat = dataSnapshot.child("ck2").child("lat").getValue(Double.class);
+                Double ck2lon = dataSnapshot.child("ck2").child("lon").getValue(Double.class);
+                long unixSeconds = dataSnapshot.child("ck1").child("도착시간").getValue(Long.class);
+                Date date = new Date(unixSeconds * 1000L);
+
+                SimpleDateFormat hour = new SimpleDateFormat("hh");
+                SimpleDateFormat minute = new SimpleDateFormat("mm");
+                String formattedDate = hour.format(date) + "시 " + minute.format(date) + "분";
+
+                long unixSecond2s = dataSnapshot.child("ck2").child("도착시간").getValue(Long.class);
+                Date date2 = new Date(unixSeconds * 1000L);
+
+                SimpleDateFormat hour2 = new SimpleDateFormat("hh");
+                SimpleDateFormat minute2 = new SimpleDateFormat("mm");
+                String formattedDate2 = hour.format(date) + "시 " + minute.format(date) + "분";
+
+                ck1marker2 = mGoogleMap.addMarker(new MarkerOptions().title(formattedDate).position(new LatLng(ck1lat, ck1lon)).icon(BitmapDescriptorFactory.fromResource(R.drawable.check)));
+                ck2marker2 = mGoogleMap.addMarker(new MarkerOptions().title(formattedDate2).position(new LatLng(ck2lat, ck2lon)).icon(BitmapDescriptorFactory.fromResource(R.drawable.check)));
+
+
+                ck1marker2.setVisible(false);
+                ck2marker2.setVisible(false);
+
+
+                DownloadTask downloadTask = new DownloadTask();
+                String url = "https://maps.googleapis.com/maps/api/directions/json?origin=" + Double.toString(startlat) + "," + Double.toString(startlon) + "&destination=" + Double.toString(endlat) + "," + Double.toString(endlon) + "&mode=transit&key=AIzaSyDdDWNDyd7YM9RRTdCa10ha3PhIOPScqQA";
+                Log.d("??", url);
+                String result = "";
+                String route = "";
+                try {
+                    result = downloadTask.execute(url).get();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+
+                try {
+                    JSONObject jsonObject = null;
+                    jsonObject = new JSONObject(result);
+                    route = jsonObject.getJSONArray("routes").getJSONObject(0).getJSONObject("overview_polyline").getString("points");
+                } catch (JSONException e) {
+                    Log.d("??", "오류오류");
+                }
+
+                List<LatLng> poly;
+
+                poly = decode(route);
+
+                PolylineOptions polyoption = new PolylineOptions();
+                polyoption.geodesic(true);
+                for (int i = 0; i < poly.size(); i++) {
+                    Log.d("??", Double.toString(poly.get(i).latitude));
+                    polyoption.add(poly.get(i));
+                }
+
+                polyoption.width(10);
+                polyoption.color(Color.YELLOW);
+                line2 = mGoogleMap.addPolyline(polyoption);
+
+                line2.setVisible(false);
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
+
+    }
+
 }

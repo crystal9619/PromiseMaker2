@@ -43,7 +43,9 @@ public class makeGroupName extends AppCompatActivity {
             public void onClick(final View v) {
                 if (using_name.getText().toString().equals(""))
                     return;
+
                 Intent intent = new Intent(makeGroupName.this , showJoinNameList.class);
+
                 intent.putExtra("ID", using_name.getText().toString());
 
                 Log.e("text","지은");

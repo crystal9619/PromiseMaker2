@@ -18,6 +18,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".friendlist"></activity>
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -43,6 +44,8 @@
         <activity android:name=".GroupList" />
         <activity android:name=".makeGroupName" />
         <activity android:name=".showJoinNameList"></activity>
+
+        <activity android:name=".showCheckpoint2"/>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
