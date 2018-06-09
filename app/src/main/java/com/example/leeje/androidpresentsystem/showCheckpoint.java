@@ -10,10 +10,12 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -77,6 +79,7 @@ public class showCheckpoint extends AppCompatActivity implements OnMapReadyCallb
     private TextView time2;
     private TextView time3;
     private Button next;
+    private float pressedX;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,14 +87,6 @@ public class showCheckpoint extends AppCompatActivity implements OnMapReadyCallb
 
         setContentView(R.layout.show_checkpoint_list_layout);
 
-
-
-
-        Intent intent = getIntent();
-        ck1lat = intent.getDoubleExtra("ck1lat", 0);
-        ck1lon = intent.getDoubleExtra("ck1lon", 0);
-        ck2lat = intent.getDoubleExtra("ck2lat", 0);
-        ck2lon = intent.getDoubleExtra("ck2lon", 0);
 
         adr1 = (TextView) findViewById(R.id.adr1);
         adr2 = (TextView) findViewById(R.id.adr2);
@@ -116,15 +111,16 @@ public class showCheckpoint extends AppCompatActivity implements OnMapReadyCallb
                     if ( Build.VERSION.SDK_INT >= 19)
                         mAlarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), mPendingIntent);
                     else
-                        mAlarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), mPendingIntent);
+                        mAlarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis()-300*1000, mPendingIntent);
 
                 }
 
-
+                Toast.makeText(getApplicationContext(), "출발시간 5분전 알림이 울립니다.",Toast.LENGTH_LONG).show();
                 finish();
             }
         });
-
+        //1528541455
+        //1528541755
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -179,11 +175,17 @@ public class showCheckpoint extends AppCompatActivity implements OnMapReadyCallb
         databaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                startlat=dataSnapshot.child("start").child("lat").getValue(Double.class);
-                startlon=dataSnapshot.child("start").child("lon").getValue(Double.class);
+                startlat=dataSnapshot.child("이지은").child("start").child("lat").getValue(Double.class);
+                startlon=dataSnapshot.child("이지은").child("start").child("lon").getValue(Double.class);
                 ar_time=dataSnapshot.child("end").child("time").getValue(Long.class);
                 endlat=dataSnapshot.child("end").child("lat").getValue(Double.class);
                 endlon=dataSnapshot.child("end").child("lon").getValue(Double.class);
+
+                ck1lat=  dataSnapshot.child("이지은").child("ck1").child("lat").getValue(Double.class);
+                ck1lon =  dataSnapshot.child("이지은").child("ck1").child("lon").getValue(Double.class);
+                ck2lat =  dataSnapshot.child("이지은").child("ck2").child("lat").getValue(Double.class);
+                ck2lon =  dataSnapshot.child("이지은").child("ck2").child("lon").getValue(Double.class);
+
                 mapOperation(googleMap);
             }
             @Override
@@ -260,7 +262,7 @@ public class showCheckpoint extends AppCompatActivity implements OnMapReadyCallb
             SimpleDateFormat hour = new SimpleDateFormat("hh");
             SimpleDateFormat minute = new SimpleDateFormat("mm");
             String formattedDate = hour.format(date)+"시 "+minute.format(date)+"분";
-
+            databaseRef.child("이지은").child("ck2").child("도착시간").setValue(unixSeconds);
             time3.setText(formattedDate);
 
         }
@@ -274,7 +276,7 @@ public class showCheckpoint extends AppCompatActivity implements OnMapReadyCallb
             SimpleDateFormat hour = new SimpleDateFormat("hh");
             SimpleDateFormat minute = new SimpleDateFormat("mm");
             String formattedDate = hour.format(date)+"시 "+minute.format(date)+"분";
-
+            databaseRef.child("이지은").child("ck2").child("도착시간").setValue(unixSeconds);
             time3.setText(formattedDate);
 
         }
@@ -300,7 +302,7 @@ public class showCheckpoint extends AppCompatActivity implements OnMapReadyCallb
             SimpleDateFormat hour = new SimpleDateFormat("hh");
             SimpleDateFormat minute = new SimpleDateFormat("mm");
             String formattedDate = hour.format(date)+"시 "+minute.format(date)+"분";
-
+            databaseRef.child("이지은").child("ck1").child("도착시간").setValue(unixSeconds);
             time2.setText(formattedDate);
 
         }
@@ -313,7 +315,7 @@ public class showCheckpoint extends AppCompatActivity implements OnMapReadyCallb
             SimpleDateFormat hour = new SimpleDateFormat("hh");
             SimpleDateFormat minute = new SimpleDateFormat("mm");
             String formattedDate = hour.format(date)+"시 "+minute.format(date)+"분";
-
+            databaseRef.child("이지은").child("ck1").child("도착시간").setValue(unixSeconds);
             time2.setText(formattedDate);
 
         }
@@ -342,7 +344,7 @@ public class showCheckpoint extends AppCompatActivity implements OnMapReadyCallb
             SimpleDateFormat hour = new SimpleDateFormat("hh");
             SimpleDateFormat minute = new SimpleDateFormat("mm");
             String formattedDate = hour.format(date)+"시 "+minute.format(date)+"분";
-
+            databaseRef.child("이지은").child("start").child("출발시간").setValue(unixSeconds);
             time1.setText(formattedDate);
 
         }
@@ -355,7 +357,7 @@ public class showCheckpoint extends AppCompatActivity implements OnMapReadyCallb
             SimpleDateFormat hour = new SimpleDateFormat("hh");
             SimpleDateFormat minute = new SimpleDateFormat("mm");
             String formattedDate = hour.format(date)+"시 "+minute.format(date)+"분";
-
+            databaseRef.child("이지은").child("start").child("출발시간").setValue(unixSeconds);
             time1.setText(formattedDate);
 
         }
