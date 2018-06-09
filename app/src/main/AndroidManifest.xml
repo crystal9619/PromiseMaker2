@@ -43,6 +43,7 @@
         <activity android:name=".groupActivity" />
         <activity android:name=".GroupList" />
         <activity android:name=".makeGroupName" />
+        <activity android:name=".showJoinNameList"></activity>
 
         <activity android:name=".showCheckpoint2"/>
 

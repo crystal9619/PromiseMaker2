@@ -164,6 +164,17 @@ public class makePosition extends AppCompatActivity
         mActivity = this;
 
 
+        next.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                if (next.getText().toString().equals(""))
+                    return;
+                Intent intent = new Intent(makePosition.this , GroupList.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
