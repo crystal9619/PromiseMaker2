@@ -68,10 +68,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ExecutionException;
 
-
-public class main_location extends AppCompatActivity
+public class main_location extends AppCompatActivity//에러2
         implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
@@ -108,6 +109,7 @@ public class main_location extends AppCompatActivity
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 2002;
     private static final int UPDATE_INTERVAL_MS = 1000;  // 1초
     private static final int FASTEST_UPDATE_INTERVAL_MS = 500; // 0.5초
+    final long[] diff = new long[1];
 
     private AppCompatActivity mActivity;
     boolean askPermissionOnceAgain = false;
@@ -138,7 +140,37 @@ public class main_location extends AppCompatActivity
                 startActivity(intent);
             }
         });
-        img1 = (ImageView) findViewById(R.id.image1);
+
+        databaseReference.child("end").child("time").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.e("LOG", "dataSnapshot.getKey() : " + dataSnapshot.getKey());
+                diff[0] = dataSnapshot.getChildrenCount();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+    TimerTask adTast = new TimerTask() {
+        long now=0;
+        public void run() {
+            now = System.currentTimeMillis();
+            Log.e("gk","그만제발");
+            show(now);//에러3
+        }
+
+    };
+
+    Timer timer = new Timer();
+    Log.e("tq","그만" );;
+        timer.schedule(adTast, 3000); // 0초후 첫실행, 3초마다 계속실행
+        //timer.schedule(adTast, 0, 3000); // 0초후 첫실행, 3초마다 계속실행
+
+
+    img1 = (ImageView) findViewById(R.id.image1);
         img1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -157,6 +189,7 @@ public class main_location extends AppCompatActivity
                 }
             }
         });
+
         img2 = (ImageView) findViewById(R.id.image2);
         img2.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -198,6 +231,65 @@ public class main_location extends AppCompatActivity
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+    }
+
+    private void show(long n) {
+        Log.e("td","실행되라");
+        //if(diff[0]==n){
+            Log.e("id","여기까지 들어와");
+
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);     // 여기서 this는 Activity의 this
+
+        builder.setTitle("약속종료 확인 대화 상자")        // 제목 설정
+
+                .setMessage("약속을 종료 하시겠습니까?")        // 메세지 설정
+
+                .setCancelable(false)        // 뒤로 버튼 클릭시 취소 가능 설정
+
+                .setPositiveButton("확인", new DialogInterface.OnClickListener(){
+
+                    // 확인 버튼 클릭시 설정
+
+                    public void onClick(DialogInterface dialog, int whichButton){
+
+                        finish();
+
+                    }
+
+                })
+
+                .setNegativeButton("취소", new DialogInterface.OnClickListener(){
+
+                    // 취소 버튼 클릭시 설정
+
+                    public void onClick(DialogInterface dialog, int whichButton){
+
+                        dialog.cancel();
+
+                    }
+
+                });
+        AlertDialog dialog = builder.create();    // 알림창 객체 생성, 에러1
+        dialog.show();    // 알림창 띄우기
+
+           /* android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+            builder.setTitle("AlertDialog Title");
+            builder.setMessage("AlertDialog Content");
+            builder.setPositiveButton("예",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            Toast.makeText(getApplicationContext(), "예를 선택했습니다.", Toast.LENGTH_LONG).show();
+                        }
+                    });
+            builder.setNegativeButton("아니오",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            Toast.makeText(getApplicationContext(), "아니오를 선택했습니다.", Toast.LENGTH_LONG).show();
+                        }
+                    });
+            builder.show();*/
+        //}
     }
 
 
