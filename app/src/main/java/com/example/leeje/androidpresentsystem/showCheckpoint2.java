@@ -160,7 +160,7 @@ public class showCheckpoint2 extends AppCompatActivity implements OnMapReadyCall
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mGoogleMap = googleMap;
-        readData(googleMap);
+        readData(mGoogleMap);
 
         mGoogleMap.setOnMapLongClickListener(this);
 
@@ -258,16 +258,39 @@ public class showCheckpoint2 extends AppCompatActivity implements OnMapReadyCall
         databaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                startlat=dataSnapshot.child("류경민").child("start").child("lat").getValue(Double.class);
-                startlon=dataSnapshot.child("류경민").child("start").child("lon").getValue(Double.class);
+                startlat=dataSnapshot.child("이지은").child("start").child("lat").getValue(Double.class);
+                startlon=dataSnapshot.child("이지은").child("start").child("lon").getValue(Double.class);
                 ar_time=dataSnapshot.child("end").child("time").getValue(Long.class);
                 endlat=dataSnapshot.child("end").child("lat").getValue(Double.class);
                 endlon=dataSnapshot.child("end").child("lon").getValue(Double.class);
 
-                ck1lat=  dataSnapshot.child("류경민").child("ck1").child("lat").getValue(Double.class);
-                ck1lon =  dataSnapshot.child("류경민").child("ck1").child("lon").getValue(Double.class);
-                ck2lat =  dataSnapshot.child("류경민").child("ck2").child("lat").getValue(Double.class);
-                ck2lon =  dataSnapshot.child("류경민").child("ck2").child("lon").getValue(Double.class);
+                ck1lat=  dataSnapshot.child("이지은").child("ck1").child("lat").getValue(Double.class);
+                ck1lon =  dataSnapshot.child("이지은").child("ck1").child("lon").getValue(Double.class);
+                ck2lat =  dataSnapshot.child("이지은").child("ck2").child("lat").getValue(Double.class);
+                ck2lon =  dataSnapshot.child("이지은").child("ck2").child("lon").getValue(Double.class);
+
+                long ck1time = dataSnapshot.child("이지은").child("ck1").child("도착시간").getValue(Long.class);
+                long ck2time = dataSnapshot.child("이지은").child("ck2").child("도착시간").getValue(Long.class);
+                long starttime =  dataSnapshot.child("이지은").child("start").child("출발시간").getValue(Long.class);
+
+                Date date = new Date(ck1time*1000L);
+                SimpleDateFormat hour = new SimpleDateFormat("hh");
+                SimpleDateFormat minute = new SimpleDateFormat("mm");
+                String formattedDate = hour.format(date)+"시 "+minute.format(date)+"분";
+                time2.setText(formattedDate);
+
+                date = new Date(ck2time*1000L);
+                hour = new SimpleDateFormat("hh");
+                minute = new SimpleDateFormat("mm");
+                formattedDate = hour.format(date)+"시 "+minute.format(date)+"분";
+                time3.setText(formattedDate);
+
+                date = new Date(starttime*1000L);
+                hour = new SimpleDateFormat("hh");
+                minute = new SimpleDateFormat("mm");
+                formattedDate = hour.format(date)+"시 "+minute.format(date)+"분";
+                time1.setText(formattedDate);
+
 
                 mapOperation(googleMap);
             }
@@ -294,14 +317,12 @@ public class showCheckpoint2 extends AppCompatActivity implements OnMapReadyCall
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.check));
         mGoogleMap.addMarker(ck2);
 
-
         MarkerOptions end = new MarkerOptions();
         end.position(new LatLng(endlat,endlon)).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_map_arrive));
         mGoogleMap.addMarker(end).showInfoWindow();
 
         adr2.setText(getCurrentAddress(ck1.getPosition()));
         adr3.setText(getCurrentAddress(ck2.getPosition()));
-
 
         MarkerOptions start = new MarkerOptions();
         start.position(new LatLng(startlat, startlon))
@@ -311,133 +332,6 @@ public class showCheckpoint2 extends AppCompatActivity implements OnMapReadyCall
 
         mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(startlat,startlon),13));
         adr1.setText(getCurrentAddress(new LatLng(startlat,startlon)));
-
-        urlTask url3 = new urlTask();
-        String timetxt3= null;
-        unixSeconds=ar_time;
-        try {
-            timetxt3 = url3.execute(ck2lat,ck2lon,endlat,endlon).get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-
-        if(flag==1)
-        {
-            flag=0;
-
-            unixSeconds=unixSeconds-Long.parseLong(timetxt3)*60;
-
-            Date date = new Date(unixSeconds*1000L);
-
-            SimpleDateFormat hour = new SimpleDateFormat("hh");
-            SimpleDateFormat minute = new SimpleDateFormat("mm");
-            String formattedDate = hour.format(date)+"시 "+minute.format(date)+"분";
-            databaseRef.child("류경민").child("ck2").child("도착시간").setValue(unixSeconds);
-            time3.setText(formattedDate);
-
-        }
-//1527496740
-//1527496800
-        else
-        {
-            unixSeconds = Long.parseLong(timetxt3);
-            Date date = new Date(unixSeconds*1000L);
-
-            SimpleDateFormat hour = new SimpleDateFormat("hh");
-            SimpleDateFormat minute = new SimpleDateFormat("mm");
-            String formattedDate = hour.format(date)+"시 "+minute.format(date)+"분";
-            databaseRef.child("류경민").child("ck2").child("도착시간").setValue(unixSeconds);
-            time3.setText(formattedDate);
-
-        }
-
-        urlTask url2 = new urlTask();
-        String timetxt2= null;
-        try {
-            timetxt2 = url2.execute(ck1lat,ck1lon,ck2lat,ck2lon).get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-
-        if(flag==1)
-        {
-            flag=0;
-
-            unixSeconds=unixSeconds-Long.parseLong(timetxt2)*60;
-
-            Date date = new Date(unixSeconds*1000L);
-
-            SimpleDateFormat hour = new SimpleDateFormat("hh");
-            SimpleDateFormat minute = new SimpleDateFormat("mm");
-            String formattedDate = hour.format(date)+"시 "+minute.format(date)+"분";
-            databaseRef.child("류경민").child("ck1").child("도착시간").setValue(unixSeconds);
-            time2.setText(formattedDate);
-
-        }
-
-        else
-        {
-            unixSeconds = Long.parseLong(timetxt2);
-            Date date = new Date(unixSeconds*1000L);
-
-            SimpleDateFormat hour = new SimpleDateFormat("hh");
-            SimpleDateFormat minute = new SimpleDateFormat("mm");
-            String formattedDate = hour.format(date)+"시 "+minute.format(date)+"분";
-            databaseRef.child("류경민").child("ck1").child("도착시간").setValue(unixSeconds);
-            time2.setText(formattedDate);
-
-        }
-
-
-
-
-        urlTask url = new urlTask();
-        String timetxt1= null;
-        try {
-            timetxt1 = url.execute(startlat,startlon,ck1lat,ck1lon).get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-
-        if(flag==1)
-        {
-            flag=0;
-
-            unixSeconds=unixSeconds-Long.parseLong(timetxt1)*60;
-
-            Date date = new Date(unixSeconds*1000L);
-
-            SimpleDateFormat hour = new SimpleDateFormat("hh");
-            SimpleDateFormat minute = new SimpleDateFormat("mm");
-            String formattedDate = hour.format(date)+"시 "+minute.format(date)+"분";
-            databaseRef.child("류경민").child("start").child("출발시간").setValue(unixSeconds);
-            time1.setText(formattedDate);
-
-        }
-
-        else
-        {
-            unixSeconds = Long.parseLong(timetxt1);
-            Date date = new Date(unixSeconds*1000L);
-
-            SimpleDateFormat hour = new SimpleDateFormat("hh");
-            SimpleDateFormat minute = new SimpleDateFormat("mm");
-            String formattedDate = hour.format(date)+"시 "+minute.format(date)+"분";
-            databaseRef.child("류경민").child("start").child("출발시간").setValue(unixSeconds);
-            time1.setText(formattedDate);
-
-        }
-
-
-
-
-
 
     }
 
@@ -530,89 +424,7 @@ public class showCheckpoint2 extends AppCompatActivity implements OnMapReadyCall
             return doc.select("leg departure_time value").last().text();
 
         }
-        /*
-        if(flag==1.0)
-        {
-            return doc.select("leg departure_time value").last().text();
-        }
-        else
-        {
-            return  doc.select("leg duration value").last().text();
-        }
-*/
-        /*
-
-        stemp안에 travel mode == transit 이라면면
-       transit_detail -> step (여러개있음) -> leg -> route -> directionsresponse>
-
-        try{
-
-
-
-            URL url = new URL(strUrl);
-
-            // Creating an http connection to communicate with url
-            urlConnection = (HttpURLConnection) url.openConnection();
-
-            // Connecting to url
-            urlConnection.connect();
-
-            // Reading data from url
-            iStream = urlConnection.getInputStream();
-
-            BufferedReader br = new BufferedReader(new InputStreamReader(iStream));
-
-            StringBuffer sb  = new StringBuffer();
-
-            String line = "";
-            while( ( line = br.readLine())  != null){
-                sb.append(line);
-            }
-
-            data = sb.toString();
-            Log.d("Ex", data);
-            br.close();
-
-        }catch(Exception e){
-            Log.d("Ex", e.toString());
-        }finally{
-            iStream.close();
-            urlConnection.disconnect();
-        }
-        return data;
-        */
     }
-
-
-    //long unixTime = System.currentTimeMillis()/1000L;
-/*
-    //arrival_time 원하는 도착시간 departure_time 출발시간
-    1970년 1월 1일 자정 이후의 시간 초단위
-    2012년 7월 30일 9시 45분 1343641500
-
-    arrival_stop departure_stop 출발 및 도착시의 정류장 정보
-    name 정류장 이름
-    location  위치
-
-1000밀리초는 1초니까, getTime()으로 구한 값을 1000으로 나누면 초를 얻습니다.
-
-
-
-마찬가지로 분을 구할 때는 1000*60=60000으로 나누고,
-
-
-
-시를 구할 때는 1000*60*60=3600000으로 나눕니다.
-
-
-Calendar cal = Calendar.getInstance();
-cal.set(Calendar.HOUR, 0);
-cal.set(Calendar.MINUTE, 0);
-cal.set(Calendar.SECOND, 0);
-long unixTime = cal.getTime() / 1000;
-
-
-  */
 
     public void onResume() {
 
@@ -688,6 +500,8 @@ long unixTime = cal.getTime() / 1000;
         String markerSnippet = "위도:" + String.valueOf(location.getLatitude())
                 + " 경도:" + String.valueOf(location.getLongitude());
 
+        databaseRef.child("이지은").child("moving").child("moving_site_lat").setValue(location.getLatitude());
+        databaseRef.child("이지은").child("moving").child("moving_site_lon").setValue(location.getLongitude());
         //현재 위치에 마커 생성하고 이동
         setCurrentLocation(location, markerTitle, markerSnippet);
 
@@ -796,7 +610,7 @@ long unixTime = cal.getTime() / 1000;
 
         if (currentMarker != null) currentMarker.remove();
 
-
+        Log.e("??","왜..?");
         LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
 
         MarkerOptions markerOptions = new MarkerOptions();
@@ -817,7 +631,7 @@ long unixTime = cal.getTime() / 1000;
             Log.d( TAG, "setCurrentLocation :  mGoogleMap moveCamera "
                     + location.getLatitude() + " " + location.getLongitude() ) ;
             // CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(currentLatLng, 15);
-            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(currentLatLng,18);
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(currentLatLng,11);
             mGoogleMap.moveCamera(cameraUpdate);
         }
     }
@@ -842,7 +656,7 @@ long unixTime = cal.getTime() / 1000;
         markerOptions.snippet(markerSnippet);
         markerOptions.draggable(true);
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-        currentMarker = mGoogleMap.addMarker(markerOptions);
+//        currentMarker = mGoogleMap.addMarker(markerOptions);
 
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(DEFAULT_LOCATION, 15);
         mGoogleMap.moveCamera(cameraUpdate);

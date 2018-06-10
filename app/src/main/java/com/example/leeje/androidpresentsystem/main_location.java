@@ -88,6 +88,7 @@ public class main_location extends AppCompatActivity
     private Marker ck1marker2 = null;
     private Marker ck2marker2 = null;
 
+    private long endTime;
     private Polyline line1;
     private Polyline line2;
     private Double endlat;
@@ -272,11 +273,18 @@ public class main_location extends AppCompatActivity
 
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+
+                Date date2 = new Date(endTime * 1000L);
+
+                SimpleDateFormat hour2 = new SimpleDateFormat("hh");
+                SimpleDateFormat minute2 = new SimpleDateFormat("mm");
+                String formattedDate2 = hour2.format(date2) + "시 " + minute2.format(date2) + "분";
+
                 endlat = dataSnapshot.child("lat").getValue(Double.class);
                 endlon = dataSnapshot.child("lon").getValue(Double.class);
                 slow();
                 MarkerOptions end = new MarkerOptions();
-                end.position(new LatLng(endlat, endlon)).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_map_arrive));
+                end.position(new LatLng(endlat, endlon)).title(formattedDate2).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_map_arrive));
                 mGoogleMap.addMarker(end).showInfoWindow();
             }
 
@@ -308,14 +316,14 @@ public class main_location extends AppCompatActivity
         });
 
 
-        databaseReference.child("이지은").child("moving").addValueEventListener(new ValueEventListener() {
+        databaseReference.child("류경민").child("moving").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Double lat = dataSnapshot.child("moving_site_lat").getValue(Double.class);
                 Double lon = dataSnapshot.child("moving_site_lon").getValue(Double.class);
                 if (marker2 != null) marker2.remove();
                 marker2 = mGoogleMap.addMarker(new MarkerOptions().position(new LatLng(lat, lon)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)));
-                name2.setText("이지은");
+                name2.setText("류경민");
                 adr2.setText(getCurrentAddress(new LatLng(lat, lon)));
                 Log.e("??", "데이터 넣는중...");
             }
@@ -386,8 +394,8 @@ public class main_location extends AppCompatActivity
     @Override
     public void onLocationChanged(Location location) {
 
-        databaseReference.child("류경민").child("moving").child("moving_site_lat").setValue(location.getLatitude());
-        databaseReference.child("류경민").child("moving").child("moving_site_lon").setValue(location.getLongitude());
+        databaseReference.child("이지은").child("moving").child("moving_site_lat").setValue(location.getLatitude());
+        databaseReference.child("이지은").child("moving").child("moving_site_lon").setValue(location.getLongitude());
 
         currentPosition
                 = new LatLng(location.getLatitude(), location.getLongitude());
@@ -590,7 +598,7 @@ public class main_location extends AppCompatActivity
         markerOptions.snippet(markerSnippet);
         markerOptions.draggable(true);
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-        currentMarker = mGoogleMap.addMarker(markerOptions);
+        //currentMarker = mGoogleMap.addMarker(markerOptions);
 
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(DEFAULT_LOCATION, 13);
         mGoogleMap.moveCamera(cameraUpdate);
@@ -890,11 +898,11 @@ public class main_location extends AppCompatActivity
                 String formattedDate = hour.format(date) + "시 " + minute.format(date) + "분";
 
                 long unixSecond2s = dataSnapshot.child("ck2").child("도착시간").getValue(Long.class);
-                Date date2 = new Date(unixSeconds * 1000L);
+                Date date2 = new Date(unixSecond2s * 1000L);
 
                 SimpleDateFormat hour2 = new SimpleDateFormat("hh");
                 SimpleDateFormat minute2 = new SimpleDateFormat("mm");
-                String formattedDate2 = hour.format(date) + "시 " + minute.format(date) + "분";
+                String formattedDate2 = hour2.format(date2) + "시 " + minute2.format(date2) + "분";
 
                 ck1marker = mGoogleMap.addMarker(new MarkerOptions().title(formattedDate).position(new LatLng(ck1lat, ck1lon)).icon(BitmapDescriptorFactory.fromResource(R.drawable.check)));
                 ck2marker = mGoogleMap.addMarker(new MarkerOptions().title(formattedDate2).position(new LatLng(ck2lat, ck2lon)).icon(BitmapDescriptorFactory.fromResource(R.drawable.check)));
@@ -951,7 +959,7 @@ public class main_location extends AppCompatActivity
             }
         });
 
-        databaseReference.child("이지은").addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseReference.child("류경민").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Double startlat = dataSnapshot.child("start").child("lat").getValue(Double.class);
@@ -968,11 +976,11 @@ public class main_location extends AppCompatActivity
                 String formattedDate = hour.format(date) + "시 " + minute.format(date) + "분";
 
                 long unixSecond2s = dataSnapshot.child("ck2").child("도착시간").getValue(Long.class);
-                Date date2 = new Date(unixSeconds * 1000L);
+                Date date2 = new Date(unixSecond2s * 1000L);
 
                 SimpleDateFormat hour2 = new SimpleDateFormat("hh");
                 SimpleDateFormat minute2 = new SimpleDateFormat("mm");
-                String formattedDate2 = hour.format(date) + "시 " + minute.format(date) + "분";
+                String formattedDate2 = hour2.format(date2) + "시 " + minute2.format(date2) + "분";
 
                 ck1marker2 = mGoogleMap.addMarker(new MarkerOptions().title(formattedDate).position(new LatLng(ck1lat, ck1lon)).icon(BitmapDescriptorFactory.fromResource(R.drawable.check)));
                 ck2marker2 = mGoogleMap.addMarker(new MarkerOptions().title(formattedDate2).position(new LatLng(ck2lat, ck2lon)).icon(BitmapDescriptorFactory.fromResource(R.drawable.check)));
@@ -1026,6 +1034,19 @@ public class main_location extends AppCompatActivity
             public void onCancelled(DatabaseError databaseError) {
             }
         });
+
+        databaseReference.child("end").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                endTime=dataSnapshot.child("time").getValue(Long.class);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
 
     }
 
