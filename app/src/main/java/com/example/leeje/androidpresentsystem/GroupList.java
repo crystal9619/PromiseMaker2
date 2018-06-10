@@ -81,7 +81,7 @@ public class GroupList extends AppCompatActivity  {
                 String groupname = (String) parent.getItemAtPosition(position);
                 if(flag==1)
                 {
-                    Intent intent = new Intent(GroupList.this, showJoinNameList.class);
+                    Intent intent = new Intent(GroupList.this, main_location.class);
                     startActivity(intent);
                 }
 

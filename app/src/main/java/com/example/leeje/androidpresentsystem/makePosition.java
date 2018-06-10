@@ -115,8 +115,7 @@ public class makePosition extends AppCompatActivity
         next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                databaseReference.child("end").child("lat").setValue(departure.latitude);
-                databaseReference.child("end").child("lon").setValue(departure.longitude);
+
                 finish();
             }
         });
@@ -512,7 +511,7 @@ public class makePosition extends AppCompatActivity
         markerOptions.snippet(markerSnippet);
         markerOptions.draggable(true);
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-        currentMarker = mGoogleMap.addMarker(markerOptions);
+        //currentMarker = mGoogleMap.addMarker(markerOptions);
 
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(DEFAULT_LOCATION, 15);
         mGoogleMap.moveCamera(cameraUpdate);
@@ -687,6 +686,8 @@ public class makePosition extends AppCompatActivity
         mGoogleMap.addMarker(new MarkerOptions().position(latLng).title("도착지").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
         dep.setText(getCurrentAddress(latLng));
         departure = latLng;
+        databaseReference.child("end").child("lat").setValue(departure.latitude);
+        databaseReference.child("end").child("lon").setValue(departure.longitude);
     }
 
     @Override

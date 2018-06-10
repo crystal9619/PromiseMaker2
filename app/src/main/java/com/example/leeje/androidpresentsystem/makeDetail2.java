@@ -110,10 +110,10 @@ public class makeDetail2 extends AppCompatActivity implements OnMapReadyCallback
                 intent.putExtra("ck1lon",ck1lon);
                 intent.putExtra("ck2lat",ck2lat);
                 intent.putExtra("ck2lon",ck2lon);
-                databaseRef.child("류경민").child("ck1").child("lat").setValue(ck1lat);
-                databaseRef.child("류경민").child("ck1").child("lon").setValue(ck1lon);
-                databaseRef.child("류경민").child("ck2").child("lat").setValue(ck2lat);
-                databaseRef.child("류경민").child("ck2").child("lon").setValue(ck2lon);
+                databaseRef.child("이지은").child("ck1").child("lat").setValue(ck1lat);
+                databaseRef.child("이지은").child("ck1").child("lon").setValue(ck1lon);
+                databaseRef.child("이지은").child("ck2").child("lat").setValue(ck2lat);
+                databaseRef.child("이지은").child("ck2").child("lon").setValue(ck2lon);
                 startActivity(intent);
                 finish();
             }
@@ -301,8 +301,8 @@ public class makeDetail2 extends AppCompatActivity implements OnMapReadyCallback
         databaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                lat=dataSnapshot.child("류경민").child("start").child("lat").getValue(Double.class);
-                lon=dataSnapshot.child("류경민").child("start").child("lon").getValue(Double.class);
+                lat=dataSnapshot.child("이지은").child("start").child("lat").getValue(Double.class);
+                lon=dataSnapshot.child("이지은").child("start").child("lon").getValue(Double.class);
                 ar_time=dataSnapshot.child("end").child("time").getValue(Long.class);
                 endlat=dataSnapshot.child("end").child("lat").getValue(Double.class);
                 endlon=dataSnapshot.child("end").child("lon").getValue(Double.class);
