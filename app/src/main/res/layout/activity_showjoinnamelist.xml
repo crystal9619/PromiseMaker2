@@ -23,10 +23,11 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="20dp"
-                android:text="약속초대 대상자"
                 android:layout_marginBottom="20dp"
-                android:gravity="center"/>
+                android:fontFamily="@font/nothing_you_could_do"
+                android:gravity="center"
+                android:text="Choose your promise mate"
+                android:textSize="24sp" />
             <ListView
                 android:id="@+id/name_list"
                 android:layout_width="match_parent"

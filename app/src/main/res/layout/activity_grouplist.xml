@@ -23,11 +23,12 @@ tools:layout_editor_absoluteX="0dp">
 
             <TextView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="20dp"
-                android:text="현재 개설된 약속"
+                android:layout_height="42dp"
                 android:layout_marginBottom="20dp"
-                android:gravity="center"/>
+                android:fontFamily="@font/nothing_you_could_do"
+                android:gravity="center"
+                android:text="Promise that you made"
+                android:textSize="24sp" />
             <ListView
                 android:id="@+id/group_list"
                 android:layout_width="match_parent"
@@ -37,16 +38,19 @@ tools:layout_editor_absoluteX="0dp">
 
         </LinearLayout>
     </LinearLayout>
- <android.support.design.widget.FloatingActionButton
+
+    <android.support.design.widget.FloatingActionButton
         android:id="@+id/fbtn2"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginBottom="70sp"
-        android:layout_marginRight="15sp"
-        android:backgroundTint="#9500ff"
-        app:srcCompat="@android:drawable/ic_input_add" />
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="49dp"
+        android:layout_marginEnd="32dp"
+        android:backgroundTint="#05b64df7"
+        app:backgroundTint="#04f8f2f2"
+        app:rippleColor="@android:color/transparent"
+        app:srcCompat="@drawable/ic_input_add" />
 
     <!--
         <Button

@@ -258,20 +258,20 @@ public class showCheckpoint2 extends AppCompatActivity implements OnMapReadyCall
         databaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                startlat=dataSnapshot.child("이지은").child("start").child("lat").getValue(Double.class);
-                startlon=dataSnapshot.child("이지은").child("start").child("lon").getValue(Double.class);
+                startlat=dataSnapshot.child("박수정").child("start").child("lat").getValue(Double.class);
+                startlon=dataSnapshot.child("박수정").child("start").child("lon").getValue(Double.class);
                 ar_time=dataSnapshot.child("end").child("time").getValue(Long.class);
                 endlat=dataSnapshot.child("end").child("lat").getValue(Double.class);
                 endlon=dataSnapshot.child("end").child("lon").getValue(Double.class);
 
-                ck1lat=  dataSnapshot.child("이지은").child("ck1").child("lat").getValue(Double.class);
-                ck1lon =  dataSnapshot.child("이지은").child("ck1").child("lon").getValue(Double.class);
-                ck2lat =  dataSnapshot.child("이지은").child("ck2").child("lat").getValue(Double.class);
-                ck2lon =  dataSnapshot.child("이지은").child("ck2").child("lon").getValue(Double.class);
+                ck1lat=  dataSnapshot.child("박수정").child("ck1").child("lat").getValue(Double.class);
+                ck1lon =  dataSnapshot.child("박수정").child("ck1").child("lon").getValue(Double.class);
+                ck2lat =  dataSnapshot.child("박수정").child("ck2").child("lat").getValue(Double.class);
+                ck2lon =  dataSnapshot.child("박수정").child("ck2").child("lon").getValue(Double.class);
 
-                long ck1time = dataSnapshot.child("이지은").child("ck1").child("도착시간").getValue(Long.class);
-                long ck2time = dataSnapshot.child("이지은").child("ck2").child("도착시간").getValue(Long.class);
-                long starttime =  dataSnapshot.child("이지은").child("start").child("출발시간").getValue(Long.class);
+                long ck1time = dataSnapshot.child("박수정").child("ck1").child("도착시간").getValue(Long.class);
+                long ck2time = dataSnapshot.child("박수정").child("ck2").child("도착시간").getValue(Long.class);
+                long starttime =  dataSnapshot.child("박수정").child("start").child("출발시간").getValue(Long.class);
 
                 Date date = new Date(ck1time*1000L);
                 SimpleDateFormat hour = new SimpleDateFormat("hh");
@@ -500,8 +500,8 @@ public class showCheckpoint2 extends AppCompatActivity implements OnMapReadyCall
         String markerSnippet = "위도:" + String.valueOf(location.getLatitude())
                 + " 경도:" + String.valueOf(location.getLongitude());
 
-        databaseRef.child("이지은").child("moving").child("moving_site_lat").setValue(location.getLatitude());
-        databaseRef.child("이지은").child("moving").child("moving_site_lon").setValue(location.getLongitude());
+        databaseRef.child("박수정").child("moving").child("moving_site_lat").setValue(location.getLatitude());
+        databaseRef.child("박수정").child("moving").child("moving_site_lon").setValue(location.getLongitude());
         //현재 위치에 마커 생성하고 이동
         setCurrentLocation(location, markerTitle, markerSnippet);
 

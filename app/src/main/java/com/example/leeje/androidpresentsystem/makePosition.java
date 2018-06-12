@@ -49,10 +49,21 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.messaging.FirebaseMessaging;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ExecutionException;
 
 
 public class makePosition extends AppCompatActivity
@@ -101,11 +112,9 @@ public class makePosition extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_makepromise_position);
 
-
-        imm=(InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 
         edit = (EditText) findViewById(R.id.edit);
         search = (Button) findViewById(R.id.searchButton);
@@ -116,16 +125,31 @@ public class makePosition extends AppCompatActivity
             @Override
             public void onClick(View view) {
 
+                urlTask url = new urlTask();
+                try {
+                    Log.e("수정", "되나요?");
+                    url.execute().get();
+                } catch (InterruptedException e) {
+                    Log.e("수정", "안되나요?");
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    Log.e("수정", "안되나요?");
+                    e.printStackTrace();
+                }
+
+                Log.e("수정", "왜");
                 finish();
+
+
             }
         });
 
 
-        View.OnClickListener myClickListener = new View.OnClickListener(){
+        View.OnClickListener myClickListener = new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
-             imm.hideSoftInputFromWindow(edit.getWindowToken(),0);
+                imm.hideSoftInputFromWindow(edit.getWindowToken(), 0);
             }
         };
 
@@ -135,7 +159,7 @@ public class makePosition extends AppCompatActivity
             public void onClick(View view) {
 
 
-                imm.hideSoftInputFromWindow(edit.getWindowToken(),0);
+                imm.hideSoftInputFromWindow(edit.getWindowToken(), 0);
 
                 List<Address> list = null;
                 String str = edit.getText().toString();
@@ -162,17 +186,6 @@ public class makePosition extends AppCompatActivity
         Log.d(TAG, "onCreate");
         mActivity = this;
 
-
-        next.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(final View v) {
-                if (next.getText().toString().equals(""))
-                    return;
-                Intent intent = new Intent(makePosition.this , GroupList.class);
-                startActivity(intent);
-                finish();
-            }
-        });
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
@@ -693,6 +706,59 @@ public class makePosition extends AppCompatActivity
     @Override
     public void onMapClick(LatLng latLng) {
 
+    }
+
+
+    private class urlTask extends AsyncTask<Void, Void, Void> {
+
+
+        // Downloading data in non-ui thread
+        @Override
+        protected Void doInBackground(Void... voids) {
+
+
+            // FMC 메시지 생성 start
+            JSONObject root = new JSONObject();
+            JSONObject notification = new JSONObject();
+
+            try {
+
+                Log.e("수정", "이부분실행노노?");
+                notification.put("body", "체크포인트를 설정하세요");
+                notification.put("title", "새로운 약속 등록");
+                root.put("notification", notification);
+                root.put("to", "/topics/new");
+                // FMC 메시지 생성 end
+                URL Url = null;
+                Url = new URL("https://fcm.googleapis.com/fcm/send");
+                HttpURLConnection conn = null;
+                conn = (HttpURLConnection) Url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setDoOutput(true);
+                conn.setDoInput(true);
+                conn.addRequestProperty("Authorization", "key=" + "AAAAeX4i1ao:APA91bFA8ruWXNr1erWOtzIscJ7hNLA3E9Tq5tIPztK4yZfugzBgRSMxVWbp5hcHAQJWHprA_GTD5DUbnVkn471p484NVhINdGeY73Nfp3R25szxsasiDKt1wzWw3VogfMELEFoqbw_V");
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setRequestProperty("Content-type", "application/json");
+                OutputStream os = null;
+
+                os = conn.getOutputStream();
+
+                os.write(root.toString().getBytes("utf-8"));
+                os.flush();
+
+                Log.e("수정",Integer.toString(conn.getResponseCode()));
+            } catch (ProtocolException e) {
+                Log.e("수정", "이부분실행노노노?");
+                e.printStackTrace();
+            } catch (IOException e) {
+                Log.e("수정", "이부분실행노노노?");
+                e.printStackTrace();
+            } catch (JSONException e) {
+                Log.e("수정", "이부분실행노노노?");
+                e.printStackTrace();
+            }
+            return null;
+        }
     }
 
 

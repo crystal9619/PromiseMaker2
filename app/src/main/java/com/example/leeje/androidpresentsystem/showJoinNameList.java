@@ -80,9 +80,9 @@ public class showJoinNameList extends AppCompatActivity {
         Log.e("text","get uid");
         String uid=mUser.getUid();
 
-        databaseReference.child("group").child("uid_group").child("이지은").setValue(0);
-        databaseReference.child("group").child("uid_group").child("이지은").setValue(0);
-        databaseReference.child("group").child("uid_group").child("이지은").setValue(0);
+        databaseReference.child("group").child("uid_group").child("박수정").setValue(0);
+        databaseReference.child("group").child("uid_group").child("박수정").setValue(0);
+        databaseReference.child("group").child("uid_group").child("박수정").setValue(0);
         databaseReference.child("group").child("uid_group").addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {

@@ -61,7 +61,9 @@ public class makeGroupName extends AppCompatActivity {
                             Log.e("text","get uid");
                             String idToken=task.getResult().getToken();
                             String uid=mUser.getUid();
-                            databaseReference.child("UID").child("uid_group").child(uid).child("group").child(using_name.getText().toString()).setValue(0);
+                            databaseReference.child("group").child("name").child(using_name.getText().toString()).setValue(0);
+
+
                             //databaseReference.child("group").child(using_name.getText().toString());
                             Log.e("text","token next");
                         }

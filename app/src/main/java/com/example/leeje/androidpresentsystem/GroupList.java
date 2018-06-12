@@ -32,6 +32,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,6 +53,9 @@ public class GroupList extends AppCompatActivity  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_grouplist);
 
+        FirebaseMessaging.getInstance().subscribeToTopic("new");
+
+        FirebaseMessaging.getInstance().subscribeToTopic("noti");
         final String[] selected_group = {"null"};
         groupMake = findViewById(R.id.fbtn2);
         groupMake.setOnClickListener(new View.OnClickListener() {
@@ -98,11 +102,19 @@ public class GroupList extends AppCompatActivity  {
             }
         });
 
+        group_list1.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                return false;
+            }
+        });
+
         final FirebaseUser mUser= FirebaseAuth.getInstance().getCurrentUser();
         Log.e("text","get uid");
 
         String uid=mUser.getUid();
-        databaseReference.child("UID").child("uid_group").child(uid).child("group").addChildEventListener(new ChildEventListener() {
+        databaseReference.child("group").child("name").addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 Log.e("LOG", "dataSnapshot.getKey() : " + dataSnapshot.getKey());
