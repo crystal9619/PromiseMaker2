@@ -112,7 +112,6 @@ public class GroupList extends AppCompatActivity  {
 
         final FirebaseUser mUser= FirebaseAuth.getInstance().getCurrentUser();
         Log.e("text","get uid");
-
         String uid=mUser.getUid();
         databaseReference.child("group").child("name").addChildEventListener(new ChildEventListener() {
             @Override
