@@ -65,6 +65,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -88,6 +89,8 @@ public class main_location extends AppCompatActivity//에러2
     private Marker ck2marker = null;
     private Marker ck1marker2 = null;
     private Marker ck2marker2 = null;
+    private TimerTask mTask;
+    private Timer mTimer;
 
     private Polyline line1;
     private Polyline line2;
@@ -119,6 +122,7 @@ public class main_location extends AppCompatActivity//에러2
     boolean mMoveMapByAPI = true;
     LatLng currentPosition;
     float pressedX;
+    long checktime;
     LatLng departure;
 
     LocationRequest locationRequest = new LocationRequest()
@@ -141,11 +145,14 @@ public class main_location extends AppCompatActivity//에러2
             }
         });
 
-        databaseReference.child("end").child("time").addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseReference.child("end").addListenerForSingleValueEvent(new ValueEventListener() {
+
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.e("LOG", "dataSnapshot.getKey() : " + dataSnapshot.getKey());
-                diff[0] = dataSnapshot.getChildrenCount();
+
+                checktime = dataSnapshot.child("time").getValue(Long.class);
+
+                Log.e("differnent1", String.valueOf(checktime));
             }
 
             @Override
@@ -154,19 +161,27 @@ public class main_location extends AppCompatActivity//에러2
             }
         });
 
-    TimerTask adTast = new TimerTask() {
+     mTask = new TimerTask() {
         long now=0;
+        @Override
         public void run() {
-            now = System.currentTimeMillis();
-            Log.e("gk","그만제발");
-            show(now);//에러3
+            mActivity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DATE), calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND));
+                    now=calendar.getTimeInMillis()/1000;
+                    //now = System.currentTimeMillis();
+                    Log.e("그만제발", String.valueOf(now));
+                    show(now);//에러3
+                }
+            });
         }
-
     };
 
-    Timer timer = new Timer();
-    Log.e("tq","그만" );;
-        timer.schedule(adTast, 3000); // 0초후 첫실행, 3초마다 계속실행
+    mTimer = new Timer();
+    Log.e("tq","그만" );
+    mTimer.schedule(mTask, 3000); // 0초후 첫실행, 3초마다 계속실행
         //timer.schedule(adTast, 0, 3000); // 0초후 첫실행, 3초마다 계속실행
 
 
@@ -234,62 +249,42 @@ public class main_location extends AppCompatActivity//에러2
     }
 
     private void show(long n) {
-        Log.e("td","실행되라");
-        //if(diff[0]==n){
-            Log.e("id","여기까지 들어와");
+        Log.e("td", "실행되라");
+        if (checktime <= n) {
+            Log.e("id", "여기까지 들어와");
 
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);     // 여기서 this는 Activity의 this
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);     // 여기서 this는 Activity의 this
+            builder.setTitle("약속종료 확인 대화 상자")        // 제목 설정
 
-        builder.setTitle("약속종료 확인 대화 상자")        // 제목 설정
+                    .setMessage("약속을 종료 하시겠습니까?")        // 메세지 설정
 
-                .setMessage("약속을 종료 하시겠습니까?")        // 메세지 설정
+                    .setCancelable(false)        // 뒤로 버튼 클릭시 취소 가능 설정
 
-                .setCancelable(false)        // 뒤로 버튼 클릭시 취소 가능 설정
+                    .setPositiveButton("확인", new DialogInterface.OnClickListener() {
 
-                .setPositiveButton("확인", new DialogInterface.OnClickListener(){
+                        // 확인 버튼 클릭시 설정
 
-                    // 확인 버튼 클릭시 설정
+                        public void onClick(DialogInterface dialog, int whichButton) {
 
-                    public void onClick(DialogInterface dialog, int whichButton){
+                            finish();
 
-                        finish();
-
-                    }
-
-                })
-
-                .setNegativeButton("취소", new DialogInterface.OnClickListener(){
-
-                    // 취소 버튼 클릭시 설정
-
-                    public void onClick(DialogInterface dialog, int whichButton){
-
-                        dialog.cancel();
-
-                    }
-
-                });
-        AlertDialog dialog = builder.create();    // 알림창 객체 생성, 에러1
-        dialog.show();    // 알림창 띄우기
-
-           /* android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
-            builder.setTitle("AlertDialog Title");
-            builder.setMessage("AlertDialog Content");
-            builder.setPositiveButton("예",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            Toast.makeText(getApplicationContext(), "예를 선택했습니다.", Toast.LENGTH_LONG).show();
                         }
-                    });
-            builder.setNegativeButton("아니오",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            Toast.makeText(getApplicationContext(), "아니오를 선택했습니다.", Toast.LENGTH_LONG).show();
+
+                    })
+
+                    .setNegativeButton("취소", new DialogInterface.OnClickListener() {
+
+                        // 취소 버튼 클릭시 설정
+
+                        public void onClick(DialogInterface dialog, int whichButton) {
+
+                            dialog.cancel();
+
                         }
-                    });
-            builder.show();*/
-        //}
+
+                    }).show();
+        }
     }
 
 
