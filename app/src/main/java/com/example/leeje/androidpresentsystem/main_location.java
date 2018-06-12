@@ -154,7 +154,6 @@ public class main_location extends AppCompatActivity
             public void onClick(View view) {
                 Intent intent = new Intent(main_location.this, showCheckpoint2.class);
                 startActivity(intent);
-                finish();
 
             }
         });
@@ -626,7 +625,7 @@ public class main_location extends AppCompatActivity
         if (ckeck1 == false) {
             float dist = now.distanceTo(ck1);
 
-            if (dist <= 200) {
+            if (dist <= 130) {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -673,7 +672,7 @@ public class main_location extends AppCompatActivity
         if (ckeck2 == false) {
             float dist = now.distanceTo(ck2);
 
-            if (dist <= 200) {
+            if (dist <= 130) {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
