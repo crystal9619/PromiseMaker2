@@ -103,20 +103,24 @@ public class GroupList extends AppCompatActivity {
         group_list1.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+
                 final String groupname = (String) adapterView.getItemAtPosition(i);
 
                 Log.e("냐냐냐", groupname);
                 adapter.remove(groupname);
                 databaseReference.child("group").child("name").child(groupname).removeValue();
 
+
                 return false;
             }
         });
 
+ 
         final FirebaseUser mUser = FirebaseAuth.getInstance().getCurrentUser();
         Log.e("text", "get uid");
 
         String uid = mUser.getUid();
+
         databaseReference.child("group").child("name").addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {

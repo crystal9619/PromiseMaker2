@@ -125,6 +125,7 @@ public class showCheckpoint extends AppCompatActivity implements OnMapReadyCallb
                         Log.e("알람울리는시간",Long.toString(startUnixTime-300*1000L));
                         mAlarmManager.set(AlarmManager.RTC_WAKEUP, startUnixTime-300*1000L, mPendingIntent);
                     }
+
                 }
 
                 Toast.makeText(getApplicationContext(), "출발시간 5분전 알림이 울립니다.",Toast.LENGTH_LONG).show();
