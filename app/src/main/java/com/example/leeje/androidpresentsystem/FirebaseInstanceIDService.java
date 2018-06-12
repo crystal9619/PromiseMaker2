@@ -1,6 +1,5 @@
 package com.example.leeje.androidpresentsystem;
 
-
 import android.util.Log;
 
 import com.google.firebase.iid.FirebaseInstanceId;
@@ -13,7 +12,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 
-public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
+
+public class FirebaseInstanceIDService extends FirebaseInstanceIdService {
 
     private static final String TAG = "MyFirebaseIIDService";
 

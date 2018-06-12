@@ -11,43 +11,76 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
         android:orientation="vertical">
 
         <LinearLayout
-            android:layout_weight="1"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:gravity="center"
+            android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:layout_alignParentStart="true">
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="20dp"
-                android:text="약속 이름을 입력해주세요"
                 android:layout_marginBottom="20dp"
-                android:gravity="center"/>
+                android:gravity="center"
+                android:text="약속 이름을 입력해주세요"
+                android:textSize="20dp" />
+
             <EditText
                 android:id="@+id/using_name"
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
-                android:inputType="textPersonName"
-
                 android:layout_gravity="center_horizontal"
+
+                android:layout_marginBottom="20dp"
                 android:gravity="center"
-                android:layout_marginBottom="20dp"/>
+                android:inputType="textPersonName" />
 
             <Button
                 android:id="@+id/user_next"
                 android:layout_width="100dp"
                 android:layout_height="wrap_content"
-                android:text="GO"/>
+                android:text="GO" />
 
         </LinearLayout>
 
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="121dp"
+        android:fontFamily="@font/cormorant_sc_semibold"
+        android:text="promise maker"
+        android:textSize="24sp" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="183dp"
+        android:fontFamily="serif-monospace"
+        android:text="Enter your promise title." />
+
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="68dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="40dp"
+        app:srcCompat="@drawable/img_time" />
 
 
 </RelativeLayout>

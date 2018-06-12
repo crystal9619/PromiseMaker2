@@ -11,43 +11,76 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
         android:orientation="vertical">
 
         <LinearLayout
-            android:layout_weight="1"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:gravity="center"
+            android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:layout_alignParentStart="true">
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="20dp"
-                android:text="닉네임 또는 활동이름 등록해주세요"
                 android:layout_marginBottom="20dp"
-                android:gravity="center"/>
+                android:gravity="center"
+                android:text="이름 또는 닉네임을 입력해주세요"
+                android:textSize="20dp" />
+
             <EditText
                 android:id="@+id/using_name"
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
-                android:inputType="textPersonName"
-                android:hint="USING NAME"
                 android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="20dp"
                 android:gravity="center"
-                android:layout_marginBottom="20dp"/>
+                android:hint="USING NAME"
+                android:inputType="textPersonName" />
 
             <Button
                 android:id="@+id/user_next"
                 android:layout_width="100dp"
                 android:layout_height="wrap_content"
-                android:text="GO"/>
+                android:text="GO" />
 
         </LinearLayout>
 
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="119dp"
+        android:fontFamily="@font/cormorant_sc_semibold"
+        android:text="promise maker"
+        android:textSize="24sp" />
+
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="183dp"
+        android:fontFamily="serif-monospace"
+        android:text="Enter your name(or nickname)" />
+
+    <ImageView
+        android:id="@+id/imageView4"
+        android:layout_width="68dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="53dp"
+        app:srcCompat="@drawable/img_time" />
 
 
 </RelativeLayout>

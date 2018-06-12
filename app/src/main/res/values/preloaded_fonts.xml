@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="preloaded_fonts" translatable="false">
+        <item>@font/antic_didone</item>
+        <item>@font/arvo_italic</item>
+        <item>@font/calligraffitti</item>
+        <item>@font/cedarville_cursive</item>
+        <item>@font/coming_soon</item>
+        <item>@font/cormorant_sc_semibold</item>
+        <item>@font/covered_by_your_grace</item>
+        <item>@font/gloria_hallelujah</item>
+        <item>@font/nothing_you_could_do</item>
+        <item>@font/the_girl_next_door</item>
+        <item>@font/waiting_for_the_sunrise</item>
+    </array>
+</resources>

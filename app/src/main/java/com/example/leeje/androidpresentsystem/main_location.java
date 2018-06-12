@@ -53,6 +53,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -61,7 +62,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -81,8 +86,20 @@ public class main_location extends AppCompatActivity
     private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     private DatabaseReference databaseReference = firebaseDatabase.getReference();
 
-    private long ck1lat;
-    private long ck1lon;
+
+    boolean ckeck1 = true;
+    boolean ckeck2 = true;
+
+    private Double ck1lat;
+    private Double ck1lon;
+    private Double ck2lat;
+    private Double ck2lon;
+
+    Location ck1;
+    Location ck2;
+
+
+
     private Marker ck1marker = null;
     private Marker ck2marker = null;
     private Marker ck1marker2 = null;
@@ -130,6 +147,7 @@ public class main_location extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_location_layout);
+        FirebaseMessaging.getInstance().subscribeToTopic("noti");
         Button next = (Button) findViewById(R.id.next);
         next.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -274,6 +292,7 @@ public class main_location extends AppCompatActivity
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
+                endTime = dataSnapshot.child("time").getValue(Long.class);
                 Date date2 = new Date(endTime * 1000L);
 
                 SimpleDateFormat hour2 = new SimpleDateFormat("hh");
@@ -282,7 +301,7 @@ public class main_location extends AppCompatActivity
 
                 endlat = dataSnapshot.child("lat").getValue(Double.class);
                 endlon = dataSnapshot.child("lon").getValue(Double.class);
-                slow();
+
                 MarkerOptions end = new MarkerOptions();
                 end.position(new LatLng(endlat, endlon)).title(formattedDate2).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_map_arrive));
                 mGoogleMap.addMarker(end).showInfoWindow();
@@ -293,109 +312,410 @@ public class main_location extends AppCompatActivity
 
             }
 
+        });
 
+        databaseReference.child("이지은").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                Double startlat = dataSnapshot.child("start").child("lat").getValue(Double.class);
+                Double startlon = dataSnapshot.child("start").child("lon").getValue(Double.class);
+                Double ck1lat1 = dataSnapshot.child("ck1").child("lat").getValue(Double.class);
+                Double ck1lon1 = dataSnapshot.child("ck1").child("lon").getValue(Double.class);
+                Double ck2lat1 = dataSnapshot.child("ck2").child("lat").getValue(Double.class);
+                Double ck2lon1 = dataSnapshot.child("ck2").child("lon").getValue(Double.class);
+
+                long unixSeconds = dataSnapshot.child("ck1").child("도착시간").getValue(Long.class);
+                Date date = new Date(unixSeconds * 1000L);
+
+                SimpleDateFormat hour = new SimpleDateFormat("hh");
+                SimpleDateFormat minute = new SimpleDateFormat("mm");
+                String formattedDate = hour.format(date) + "시 " + minute.format(date) + "분";
+
+                long unixSecond2s = dataSnapshot.child("ck2").child("도착시간").getValue(Long.class);
+                Date date2 = new Date(unixSecond2s * 1000L);
+
+                SimpleDateFormat hour2 = new SimpleDateFormat("hh");
+                SimpleDateFormat minute2 = new SimpleDateFormat("mm");
+                String formattedDate2 = hour2.format(date2) + "시 " + minute2.format(date2) + "분";
+
+                ck1marker = mGoogleMap.addMarker(new MarkerOptions().title(formattedDate).position(new LatLng(ck1lat1, ck1lon1)).icon(BitmapDescriptorFactory.fromResource(R.drawable.check)));
+                ck2marker = mGoogleMap.addMarker(new MarkerOptions().title(formattedDate2).position(new LatLng(ck2lat1, ck2lon1)).icon(BitmapDescriptorFactory.fromResource(R.drawable.check)));
+
+
+                ck1marker.setVisible(false);
+                ck2marker.setVisible(false);
+
+
+                DownloadTask downloadTask = new DownloadTask();
+                String url = "https://maps.googleapis.com/maps/api/directions/json?origin=" + Double.toString(startlat) + "," + Double.toString(startlon) + "&destination=" + Double.toString(endlat) + "," + Double.toString(endlon) + "&mode=transit&key=AIzaSyDdDWNDyd7YM9RRTdCa10ha3PhIOPScqQA";
+                Log.d("??", url);
+                String result = "";
+                String route = "";
+                try {
+                    result = downloadTask.execute(url).get();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+
+                try {
+                    JSONObject jsonObject = null;
+                    jsonObject = new JSONObject(result);
+                    route = jsonObject.getJSONArray("routes").getJSONObject(0).getJSONObject("overview_polyline").getString("points");
+                } catch (JSONException e) {
+                    Log.d("??", "오류오류");
+                }
+
+                List<LatLng> poly;
+
+                poly = decode(route);
+
+                PolylineOptions polyoption = new PolylineOptions();
+                polyoption.geodesic(true);
+                for (int i = 0; i < poly.size(); i++) {
+                    Log.d("??", Double.toString(poly.get(i).latitude));
+                    polyoption.add(poly.get(i));
+                }
+
+                polyoption.width(10);
+                polyoption.color(Color.GREEN);
+                line1 = mGoogleMap.addPolyline(polyoption);
+
+                line1.setVisible(false);
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
+
+        databaseReference.child("류경민").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                Log.e("아놔","여기는 작동할까요?");
+                Double startlat = dataSnapshot.child("start").child("lat").getValue(Double.class);
+                Double startlon = dataSnapshot.child("start").child("lon").getValue(Double.class);
+               Double ck1lat2 = dataSnapshot.child("ck1").child("lat").getValue(Double.class);
+               Double ck1lon2 = dataSnapshot.child("ck1").child("lon").getValue(Double.class);
+               Double ck2lat2 = dataSnapshot.child("ck2").child("lat").getValue(Double.class);
+                Double ck2lon2 = dataSnapshot.child("ck2").child("lon").getValue(Double.class);
+
+                long unixSeconds = dataSnapshot.child("ck1").child("도착시간").getValue(Long.class);
+                Date date = new Date(unixSeconds * 1000L);
+
+                SimpleDateFormat hour = new SimpleDateFormat("hh");
+                SimpleDateFormat minute = new SimpleDateFormat("mm");
+                String formattedDate = hour.format(date) + "시 " + minute.format(date) + "분";
+
+                long unixSecond2s = dataSnapshot.child("ck2").child("도착시간").getValue(Long.class);
+                Date date2 = new Date(unixSecond2s * 1000L);
+
+                SimpleDateFormat hour2 = new SimpleDateFormat("hh");
+                SimpleDateFormat minute2 = new SimpleDateFormat("mm");
+                String formattedDate2 = hour2.format(date2) + "시 " + minute2.format(date2) + "분";
+
+                ck1marker2 = mGoogleMap.addMarker(new MarkerOptions().title(formattedDate).position(new LatLng(ck1lat2, ck1lon2)).icon(BitmapDescriptorFactory.fromResource(R.drawable.check)));
+                ck2marker2 = mGoogleMap.addMarker(new MarkerOptions().title(formattedDate2).position(new LatLng(ck2lat2, ck2lon2)).icon(BitmapDescriptorFactory.fromResource(R.drawable.check)));
+
+
+                ck1marker2.setVisible(false);
+                ck2marker2.setVisible(false);
+
+
+                DownloadTask downloadTask = new DownloadTask();
+                String url = "https://maps.googleapis.com/maps/api/directions/json?origin=" + Double.toString(startlat) + "," + Double.toString(startlon) + "&destination=" + Double.toString(endlat) + "," + Double.toString(endlon) + "&mode=transit&key=AIzaSyDdDWNDyd7YM9RRTdCa10ha3PhIOPScqQA";
+                Log.d("??", url);
+                String result = "";
+                String route = "";
+                try {
+                    result = downloadTask.execute(url).get();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+
+                try {
+                    JSONObject jsonObject = null;
+                    jsonObject = new JSONObject(result);
+                    route = jsonObject.getJSONArray("routes").getJSONObject(0).getJSONObject("overview_polyline").getString("points");
+                } catch (JSONException e) {
+                    Log.d("??", "오류오류");
+                }
+
+                List<LatLng> poly;
+
+                poly = decode(route);
+
+                PolylineOptions polyoption = new PolylineOptions();
+                polyoption.geodesic(true);
+                for (int i = 0; i < poly.size(); i++) {
+                    Log.d("??", Double.toString(poly.get(i).latitude));
+                    polyoption.add(poly.get(i));
+                }
+
+                polyoption.width(10);
+                polyoption.color(Color.YELLOW);
+                line2 = mGoogleMap.addPolyline(polyoption);
+
+                line2.setVisible(false);
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
         });
 
 
-        databaseReference.child("박수정").child("moving").addValueEventListener(new ValueEventListener() {
+        //주인이름
+        databaseReference.child("박수정").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                ck1lat=  dataSnapshot.child("ck1").child("lat").getValue(Double.class);
+                ck1lon =  dataSnapshot.child("ck1").child("lon").getValue(Double.class);
+                ck2lat =  dataSnapshot.child("ck2").child("lat").getValue(Double.class);
+                ck2lon =  dataSnapshot.child("ck2").child("lon").getValue(Double.class);
+
+                ck1=new Location("ck1");
+                ck1.setLatitude(ck1lat);
+                ck1.setLongitude(ck1lon);
+                ckeck1=false;
+
+                ck2=new Location("ck2");
+                ck2.setLatitude(ck2lat);
+                ck2.setLongitude(ck2lon);
+                ckeck2=false;
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e("???","에러발생");
+            }
+        });
+
+
+
+
+
+        databaseReference.child("이지은").child("moving").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+
                 Double lat = dataSnapshot.child("moving_site_lat").getValue(Double.class);
                 Double lon = dataSnapshot.child("moving_site_lon").getValue(Double.class);
                 if (marker1 != null) marker1.remove();
                 marker1 = mGoogleMap.addMarker(new MarkerOptions().position(new LatLng(lat, lon)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
-                name1.setText("박수정");
+                name1.setText("이지은");
                 adr1.setText(getCurrentAddress(new LatLng(lat, lon)));
                 Log.e("??", "데이터 넣는중...");
+
             }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.e("???", "에러발생");
-            }
-        });
+
+
+
+        @Override
+        public void onCancelled (DatabaseError databaseError){
+            Log.e("???", "에러발생");
+        }
+    });
 
 
         databaseReference.child("류경민").child("moving").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Double lat = dataSnapshot.child("moving_site_lat").getValue(Double.class);
-                Double lon = dataSnapshot.child("moving_site_lon").getValue(Double.class);
-                if (marker2 != null) marker2.remove();
-                marker2 = mGoogleMap.addMarker(new MarkerOptions().position(new LatLng(lat, lon)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)));
-                name2.setText("류경민");
-                adr2.setText(getCurrentAddress(new LatLng(lat, lon)));
-                Log.e("??", "데이터 넣는중...");
-            }
+        @Override
+        public void onDataChange (DataSnapshot dataSnapshot){
+            Double lat = dataSnapshot.child("moving_site_lat").getValue(Double.class);
+            Double lon = dataSnapshot.child("moving_site_lon").getValue(Double.class);
+            if (marker2 != null) marker2.remove();
+            marker2 = mGoogleMap.addMarker(new MarkerOptions().position(new LatLng(lat, lon)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)));
+            name2.setText("류경민");
+            adr2.setText(getCurrentAddress(new LatLng(lat, lon)));
+            Log.e("??", "데이터 넣는중...");
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.e("???", "에러발생");
-            }
-        });
+        }
+
+        @Override
+        public void onCancelled (DatabaseError databaseError){
+            Log.e("???", "에러발생");
+        }
+    });
 
 
         mGoogleMap.setOnMapLongClickListener(this);
 
-        //런타임 퍼미션 요청 대화상자나 GPS 활성 요청 대화상자 보이기전에
-        //지도의 초기위치를 서울로 이동
-        setDefaultLocation();
+    //런타임 퍼미션 요청 대화상자나 GPS 활성 요청 대화상자 보이기전에
+    //지도의 초기위치를 서울로 이동
+    setDefaultLocation();
 
-        //mGoogleMap.getUiSettings().setZoomControlsEnabled(false);
-        mGoogleMap.getUiSettings().setMyLocationButtonEnabled(true);
+    //mGoogleMap.getUiSettings().setZoomControlsEnabled(false);
+        mGoogleMap.getUiSettings().
+
+    setMyLocationButtonEnabled(true);
         mGoogleMap.animateCamera(CameraUpdateFactory.zoomTo(13));
-        mGoogleMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
+        mGoogleMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener()
 
-            @Override
-            public boolean onMyLocationButtonClick() {
+    {
 
-                Log.d(TAG, "onMyLocationButtonClick : 위치에 따른 카메라 이동 활성화");
-                mMoveMapByAPI = true;
-                return true;
-            }
-        });
-        mGoogleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+        @Override
+        public boolean onMyLocationButtonClick () {
 
-            @Override
-            public void onMapClick(LatLng latLng) {
-
-                Log.d(TAG, "onMapClick :");
-            }
-        });
-
-        mGoogleMap.setOnCameraMoveStartedListener(new GoogleMap.OnCameraMoveStartedListener() {
-
-            @Override
-            public void onCameraMoveStarted(int i) {
-
-                if (mMoveMapByUser == true && mRequestingLocationUpdates) {
-
-                    Log.d(TAG, "onCameraMove : 위치에 따른 카메라 이동 비활성화");
-                    mMoveMapByAPI = false;
-                }
-
-                mMoveMapByUser = true;
-
-            }
-        });
-
-
-        mGoogleMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
-
-            @Override
-            public void onCameraMove() {
-
-
-            }
-        });
+        Log.d(TAG, "onMyLocationButtonClick : 위치에 따른 카메라 이동 활성화");
+        mMoveMapByAPI = true;
+        return true;
     }
+    });
+        mGoogleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener()
 
+    {
+
+        @Override
+        public void onMapClick (LatLng latLng){
+
+        Log.d(TAG, "onMapClick :");
+    }
+    });
+
+        mGoogleMap.setOnCameraMoveStartedListener(new GoogleMap.OnCameraMoveStartedListener()
+
+    {
+
+        @Override
+        public void onCameraMoveStarted ( int i){
+
+        if (mMoveMapByUser == true && mRequestingLocationUpdates) {
+
+            Log.d(TAG, "onCameraMove : 위치에 따른 카메라 이동 비활성화");
+            mMoveMapByAPI = false;
+        }
+
+        mMoveMapByUser = true;
+
+    }
+    });
+
+
+        mGoogleMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener()
+
+    {
+
+        @Override
+        public void onCameraMove () {
+
+
+    }
+    });
+}
+
+//주인이름
 
     @Override
     public void onLocationChanged(Location location) {
 
-        databaseReference.child("이지은").child("moving").child("moving_site_lat").setValue(location.getLatitude());
-        databaseReference.child("이지은").child("moving").child("moving_site_lon").setValue(location.getLongitude());
+        databaseReference.child("박수정").child("moving").child("moving_site_lat").setValue(location.getLatitude());
+        databaseReference.child("박수정").child("moving").child("moving_site_lon").setValue(location.getLongitude());
+
+        Location now = new Location("now");
+        now.setLatitude(location.getLatitude());
+        now.setLongitude(location.getLongitude());
+
+        if (ckeck1 == false) {
+            float dist = now.distanceTo(ck1);
+
+            if (dist <= 200) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try{
+                            JSONObject root = new JSONObject();
+                            JSONObject notification = new JSONObject();
+                            Log.e("수정찡", "이부분실행노노?");
+                            notification.put("body", "박수정 체크포인트1에 도착하였습니다.");
+                            notification.put("title", "새로운 알림");
+                            root.put("notification", notification);
+                            root.put("to", "/topics/noti");
+                            // FMC 메시지 생성 end
+                            URL Url = null;
+                            Url = new URL("https://fcm.googleapis.com/fcm/send");
+                            HttpURLConnection conn = null;
+                            conn = (HttpURLConnection) Url.openConnection();
+                            conn.setRequestMethod("POST");
+                            conn.setDoOutput(true);
+                            conn.setDoInput(true);
+                            conn.addRequestProperty("Authorization", "key=" + "AAAAeX4i1ao:APA91bFA8ruWXNr1erWOtzIscJ7hNLA3E9Tq5tIPztK4yZfugzBgRSMxVWbp5hcHAQJWHprA_GTD5DUbnVkn471p484NVhINdGeY73Nfp3R25szxsasiDKt1wzWw3VogfMELEFoqbw_V");
+                            conn.setRequestProperty("Accept", "application/json");
+                            conn.setRequestProperty("Content-type", "application/json");
+                            OutputStream os = null;
+
+                            os = conn.getOutputStream();
+
+                            os.write(root.toString().getBytes("utf-8"));
+                            os.flush();
+
+                            Log.e("수정",Integer.toString(conn.getResponseCode()));
+                            ckeck1=true;
+                        } catch (ProtocolException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+            }
+        }
+
+        if (ckeck2 == false) {
+            float dist = now.distanceTo(ck2);
+
+            if (dist <= 200) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try{
+                            JSONObject root = new JSONObject();
+                            JSONObject notification = new JSONObject();
+                            Log.e("수정찡", "이부분실행노노?");
+                            notification.put("body", "박수정 체크포인트2에 도착하였습니다.");
+                            notification.put("title", "새로운 알림");
+                            root.put("notification", notification);
+                            root.put("to", "/topics/noti");
+                            // FMC 메시지 생성 end
+                            URL Url = null;
+                            Url = new URL("https://fcm.googleapis.com/fcm/send");
+                            HttpURLConnection conn = null;
+                            conn = (HttpURLConnection) Url.openConnection();
+                            conn.setRequestMethod("POST");
+                            conn.setDoOutput(true);
+                            conn.setDoInput(true);
+                            conn.addRequestProperty("Authorization", "key=" + "AAAAeX4i1ao:APA91bFA8ruWXNr1erWOtzIscJ7hNLA3E9Tq5tIPztK4yZfugzBgRSMxVWbp5hcHAQJWHprA_GTD5DUbnVkn471p484NVhINdGeY73Nfp3R25szxsasiDKt1wzWw3VogfMELEFoqbw_V");
+                            conn.setRequestProperty("Accept", "application/json");
+                            conn.setRequestProperty("Content-type", "application/json");
+                            OutputStream os = null;
+
+                            os = conn.getOutputStream();
+
+                            os.write(root.toString().getBytes("utf-8"));
+                            os.flush();
+
+                            Log.e("수정",Integer.toString(conn.getResponseCode()));
+                            ckeck2=true;
+                        } catch (ProtocolException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+            }
+        }
 
         currentPosition
                 = new LatLng(location.getLatitude(), location.getLongitude());
@@ -778,29 +1098,29 @@ public class main_location extends AppCompatActivity
 
     }
 
-    private class DownloadTask extends AsyncTask<String, Void, String> {
+private class DownloadTask extends AsyncTask<String, Void, String> {
 
-        // Downloading data in non-ui thread
-        @Override
-        protected String doInBackground(String... url) {
+    // Downloading data in non-ui thread
+    @Override
+    protected String doInBackground(String... url) {
 
-            // For storing data from web service
-            String data = "";
+        // For storing data from web service
+        String data = "";
 
-            try {
-                // Fetching the data from web service
-                data = downloadUrl(url[0]);
-            } catch (Exception e) {
-                Log.d("Background Task", e.toString());
-            }
-            return data;
+        try {
+            // Fetching the data from web service
+            data = downloadUrl(url[0]);
+        } catch (Exception e) {
+            Log.d("Background Task", e.toString());
         }
-
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-        }
-
+        return data;
     }
+
+    protected void onPostExecute(String result) {
+        super.onPostExecute(result);
+    }
+
+}
 
     private String downloadUrl(String strUrl) throws IOException {
         String data = "";
@@ -877,175 +1197,8 @@ public class main_location extends AppCompatActivity
     }
 
 
+    private void slow() {
 
-    private void slow()
-    {
-        databaseReference.child("박수정").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-
-                Double startlat = dataSnapshot.child("start").child("lat").getValue(Double.class);
-                Double startlon = dataSnapshot.child("start").child("lon").getValue(Double.class);
-                Double ck1lat = dataSnapshot.child("ck1").child("lat").getValue(Double.class);
-                Double ck1lon = dataSnapshot.child("ck1").child("lon").getValue(Double.class);
-                Double ck2lat = dataSnapshot.child("ck2").child("lat").getValue(Double.class);
-                Double ck2lon = dataSnapshot.child("ck2").child("lon").getValue(Double.class);
-                long unixSeconds = dataSnapshot.child("ck1").child("도착시간").getValue(Long.class);
-                Date date = new Date(unixSeconds * 1000L);
-
-                SimpleDateFormat hour = new SimpleDateFormat("hh");
-                SimpleDateFormat minute = new SimpleDateFormat("mm");
-                String formattedDate = hour.format(date) + "시 " + minute.format(date) + "분";
-
-                long unixSecond2s = dataSnapshot.child("ck2").child("도착시간").getValue(Long.class);
-                Date date2 = new Date(unixSecond2s * 1000L);
-
-                SimpleDateFormat hour2 = new SimpleDateFormat("hh");
-                SimpleDateFormat minute2 = new SimpleDateFormat("mm");
-                String formattedDate2 = hour2.format(date2) + "시 " + minute2.format(date2) + "분";
-
-                ck1marker = mGoogleMap.addMarker(new MarkerOptions().title(formattedDate).position(new LatLng(ck1lat, ck1lon)).icon(BitmapDescriptorFactory.fromResource(R.drawable.check)));
-                ck2marker = mGoogleMap.addMarker(new MarkerOptions().title(formattedDate2).position(new LatLng(ck2lat, ck2lon)).icon(BitmapDescriptorFactory.fromResource(R.drawable.check)));
-
-
-                ck1marker.setVisible(false);
-                ck2marker.setVisible(false);
-
-
-
-
-                DownloadTask downloadTask = new DownloadTask();
-                String url = "https://maps.googleapis.com/maps/api/directions/json?origin=" + Double.toString(startlat) + "," + Double.toString(startlon) + "&destination=" + Double.toString(endlat) + "," + Double.toString(endlon) + "&mode=transit&key=AIzaSyDdDWNDyd7YM9RRTdCa10ha3PhIOPScqQA";
-                Log.d("??", url);
-                String result = "";
-                String route = "";
-                try {
-                    result = downloadTask.execute(url).get();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
-                }
-
-                try {
-                    JSONObject jsonObject = null;
-                    jsonObject = new JSONObject(result);
-                    route = jsonObject.getJSONArray("routes").getJSONObject(0).getJSONObject("overview_polyline").getString("points");
-                } catch (JSONException e) {
-                    Log.d("??", "오류오류");
-                }
-
-                List<LatLng> poly;
-
-                poly = decode(route);
-
-                PolylineOptions polyoption = new PolylineOptions();
-                polyoption.geodesic(true);
-                for (int i = 0; i < poly.size(); i++) {
-                    Log.d("??", Double.toString(poly.get(i).latitude));
-                    polyoption.add(poly.get(i));
-                }
-
-                polyoption.width(10);
-                polyoption.color(Color.GREEN);
-                line1 = mGoogleMap.addPolyline(polyoption);
-
-                line1.setVisible(false);
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        });
-
-        databaseReference.child("류경민").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Double startlat = dataSnapshot.child("start").child("lat").getValue(Double.class);
-                Double startlon = dataSnapshot.child("start").child("lon").getValue(Double.class);
-                Double ck1lat = dataSnapshot.child("ck1").child("lat").getValue(Double.class);
-                Double ck1lon = dataSnapshot.child("ck1").child("lon").getValue(Double.class);
-                Double ck2lat = dataSnapshot.child("ck2").child("lat").getValue(Double.class);
-                Double ck2lon = dataSnapshot.child("ck2").child("lon").getValue(Double.class);
-                long unixSeconds = dataSnapshot.child("ck1").child("도착시간").getValue(Long.class);
-                Date date = new Date(unixSeconds * 1000L);
-
-                SimpleDateFormat hour = new SimpleDateFormat("hh");
-                SimpleDateFormat minute = new SimpleDateFormat("mm");
-                String formattedDate = hour.format(date) + "시 " + minute.format(date) + "분";
-
-                long unixSecond2s = dataSnapshot.child("ck2").child("도착시간").getValue(Long.class);
-                Date date2 = new Date(unixSecond2s * 1000L);
-
-                SimpleDateFormat hour2 = new SimpleDateFormat("hh");
-                SimpleDateFormat minute2 = new SimpleDateFormat("mm");
-                String formattedDate2 = hour2.format(date2) + "시 " + minute2.format(date2) + "분";
-
-                ck1marker2 = mGoogleMap.addMarker(new MarkerOptions().title(formattedDate).position(new LatLng(ck1lat, ck1lon)).icon(BitmapDescriptorFactory.fromResource(R.drawable.check)));
-                ck2marker2 = mGoogleMap.addMarker(new MarkerOptions().title(formattedDate2).position(new LatLng(ck2lat, ck2lon)).icon(BitmapDescriptorFactory.fromResource(R.drawable.check)));
-
-
-                ck1marker2.setVisible(false);
-                ck2marker2.setVisible(false);
-
-
-                DownloadTask downloadTask = new DownloadTask();
-                String url = "https://maps.googleapis.com/maps/api/directions/json?origin=" + Double.toString(startlat) + "," + Double.toString(startlon) + "&destination=" + Double.toString(endlat) + "," + Double.toString(endlon) + "&mode=transit&key=AIzaSyDdDWNDyd7YM9RRTdCa10ha3PhIOPScqQA";
-                Log.d("??", url);
-                String result = "";
-                String route = "";
-                try {
-                    result = downloadTask.execute(url).get();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
-                }
-
-                try {
-                    JSONObject jsonObject = null;
-                    jsonObject = new JSONObject(result);
-                    route = jsonObject.getJSONArray("routes").getJSONObject(0).getJSONObject("overview_polyline").getString("points");
-                } catch (JSONException e) {
-                    Log.d("??", "오류오류");
-                }
-
-                List<LatLng> poly;
-
-                poly = decode(route);
-
-                PolylineOptions polyoption = new PolylineOptions();
-                polyoption.geodesic(true);
-                for (int i = 0; i < poly.size(); i++) {
-                    Log.d("??", Double.toString(poly.get(i).latitude));
-                    polyoption.add(poly.get(i));
-                }
-
-                polyoption.width(10);
-                polyoption.color(Color.YELLOW);
-                line2 = mGoogleMap.addPolyline(polyoption);
-
-                line2.setVisible(false);
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        });
-
-        databaseReference.child("end").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                endTime=dataSnapshot.child("time").getValue(Long.class);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
 
 
     }
