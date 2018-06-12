@@ -1,5 +1,6 @@
 package com.example.leeje.androidpresentsystem;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -9,6 +10,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.SparseBooleanArray;
@@ -38,13 +40,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class GroupList extends AppCompatActivity  {
+public class GroupList extends AppCompatActivity {
 
     private ListView group_list1;
     private FloatingActionButton groupMake;
     private Button enter_btn;
 
-    int flag=0;
+    int flag = 0;
     private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     private DatabaseReference databaseReference = firebaseDatabase.getReference();
 
@@ -61,42 +63,38 @@ public class GroupList extends AppCompatActivity  {
         groupMake.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Snackbar.make(v,"약속이 생성되었습니다.",Snackbar.LENGTH_LONG).setAction("Action",null).show();
-                Intent intent = new Intent(GroupList.this , makeGroupName.class);
+                Snackbar.make(v, "약속이 생성되었습니다.", Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                Intent intent = new Intent(GroupList.this, makeGroupName.class);
 
                 startActivity(intent);
-                flag=0;
+                flag = 0;
             }
         });
 
-        Log.e("text","list map");
+        Log.e("text", "list map");
 
         group_list1 = (ListView) findViewById(R.id.group_list);
 
         final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1);
-            group_list1.setAdapter(adapter);
+        group_list1.setAdapter(adapter);
 
 
-        Log.e("text","before list click");
-        group_list1.setOnItemClickListener( new AdapterView.OnItemClickListener() {
+        Log.e("text", "before list click");
+        group_list1.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.e("text","after list click");
+                Log.e("text", "after list click");
                 String groupname = (String) parent.getItemAtPosition(position);
-                if(flag==1)
-                {
+                if (flag == 1) {
                     Intent intent = new Intent(GroupList.this, main_location.class);
                     startActivity(intent);
-                }
-
-                else
-                {
-                    Intent intent = new Intent(GroupList.this,MakeDetail.class);
+                } else {
+                    Intent intent = new Intent(GroupList.this, MakeDetail.class);
                     startActivity(intent);
-                    flag=1;
+                    flag = 1;
                 }
-                if(groupname!="null") {
-            //    intent.putExtra("groupName", groupname);
+                if (groupname != "null") {
+                    //    intent.putExtra("groupName", groupname);
 
                 }
             }
@@ -105,15 +103,20 @@ public class GroupList extends AppCompatActivity  {
         group_list1.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                final String groupname = (String) adapterView.getItemAtPosition(i);
+
+                Log.e("냐냐냐", groupname);
+                adapter.remove(groupname);
+                databaseReference.child("group").child("name").child(groupname).removeValue();
 
                 return false;
             }
         });
 
-        final FirebaseUser mUser= FirebaseAuth.getInstance().getCurrentUser();
-        Log.e("text","get uid");
+        final FirebaseUser mUser = FirebaseAuth.getInstance().getCurrentUser();
+        Log.e("text", "get uid");
 
-        String uid=mUser.getUid();
+        String uid = mUser.getUid();
         databaseReference.child("group").child("name").addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
